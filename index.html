@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MP3 Přehrávač s poznámkami</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        textarea { width: 80%; height: 100px; margin-top: 10px; }
+        button { margin: 5px; padding: 10px; }
+    </style>
+</head>
+<body>
+    <h1>Vygenerujte odkaz pro autora</h1>
+    
+    <label for="dropboxUrl">Vložte odkaz na MP3 soubor z Dropboxu:</label>
+    <input type="text" id="dropboxUrl" placeholder="Vložte Dropbox odkaz" style="width: 80%;">
+    <button onclick="generatePlayerLink()">Vygenerovat odkaz</button>
+    
+    <h3>Odkaz pro autora:</h3>
+    <input type="text" id="generatedLink" style="width: 80%;" readonly>
+    <button onclick="copyGeneratedLink()">Kopírovat odkaz</button>
+    
+    <script>
+        function generatePlayerLink() {
+            let input = document.getElementById("dropboxUrl").value;
+            if (input.includes("dropbox.com")) {
+                input = input.replace("dl=0", "raw=1");
+                const playerUrl = window.location.origin + window.location.pathname.replace("index.html", "player.html") + "?mp3=" + encodeURIComponent(input);
+                document.getElementById("generatedLink").value = playerUrl;
+            } else {
+                alert("Vložte platný Dropbox odkaz.");
+            }
+        }
+
+        function copyGeneratedLink() {
+            const generatedLink = document.getElementById("generatedLink");
+            generatedLink.select();
+            navigator.clipboard.writeText(generatedLink.value).then(() => {
+                alert("Odkaz zkopírován do schránky!");
+            }).catch(err => {
+                console.error("Chyba při kopírování:", err);
+                alert("Nepodařilo se zkopírovat odkaz.");
+            });
+        }
+    </script>
+</body>
+</html>
