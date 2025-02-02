@@ -26,7 +26,7 @@
             let input = document.getElementById("dropboxUrl").value;
             if (input.includes("dropbox.com")) {
                 input = input.replace("dl=0", "raw=1");
-                const playerUrl = window.location.origin + "/player.html?mp3=" + encodeURIComponent(input);
+                const playerUrl = window.location.origin + "/mp3-notes/player.html?mp3=" + encodeURIComponent(input);
                 document.getElementById("generatedLink").value = playerUrl;
             } else {
                 alert("Vložte platný Dropbox odkaz.");
