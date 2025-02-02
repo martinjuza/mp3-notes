@@ -4,10 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Přehrávač MP3 s poznámkami</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        audio { margin: 20px 0; }
+        button { margin: 5px; padding: 10px; }
+        textarea { margin: 10px 0; }
+    </style>
 </head>
 <body>
     <h1 id="fileName">Přehrávač MP3 s poznámkami</h1>
     <audio id="audioPlayer" controls style="width: 100%;"></audio>
+    <div>
+        <button onclick="seekBackward()">-10s</button>
+        <button onclick="playPause()">Play/Pause</button>
+        <button onclick="seekForward()">+10s</button>
+        <button onclick="changePlaybackRate(1)">1x</button>
+        <button onclick="changePlaybackRate(1.5)">1.5x</button>
+        <button onclick="changePlaybackRate(2)">2x</button>
+    </div>
     <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..." style="width: 100%; height: 100px;"></textarea>
     <button onclick="addNote()">Přidat poznámku</button>
@@ -16,7 +30,6 @@
     <ul id="notesList"></ul>
 
     <script>
-        // Načtení MP3 souboru z URL
         const urlParams = new URLSearchParams(window.location.search);
         const mp3Url = urlParams.get('mp3');
         const audioPlayer = document.getElementById('audioPlayer');
@@ -72,6 +85,26 @@
             navigator.clipboard.writeText(exportedNotes).then(() => {
                 alert('Poznámky byly zkopírovány do schránky!');
             });
+        }
+
+        function seekBackward() {
+            audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10);
+        }
+
+        function seekForward() {
+            audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 10);
+        }
+
+        function playPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
+        function changePlaybackRate(rate) {
+            audioPlayer.playbackRate = rate;
         }
     </script>
 </body>
