@@ -13,11 +13,6 @@
 <body>
     <h1>Přehrávač MP3 s poznámkami</h1>
     
-    <label for="mp3url">Vložte odkaz na MP3 soubor:</label>
-    <input type="text" id="mp3url" placeholder="Vložte odkaz nebo použijte Dropbox" style="width: 80%;">
-    <button onclick="convertDropboxLink()">Použít Dropbox odkaz</button>
-    <button onclick="loadAudio()">Načíst</button>
-    
     <audio id="audioPlayer" controls style="margin-top: 20px; width: 80%;">
         Váš prohlížeč nepodporuje přehrávání audia.
     </audio>
@@ -33,30 +28,15 @@
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea><br>
     <button onclick="addNote()">Přidat poznámku</button>
     <button onclick="exportNotes()">Exportovat poznámky</button>
-    <button onclick="copyNotes()">Kopírovat poznámky</button>
     
     <script>
-        function convertDropboxLink() {
-            let input = document.getElementById("mp3url").value;
-            if (input.includes("dropbox.com")) {
-                input = input.replace("dl=0", "raw=1");
-                document.getElementById("mp3url").value = input;
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const mp3Url = urlParams.get('mp3');
+            if (mp3Url) {
+                document.getElementById("audioPlayer").src = decodeURIComponent(mp3Url);
             }
-        }
-
-        function loadAudio() {
-            const url = document.getElementById("mp3url").value;
-            const audio = document.getElementById("audioPlayer");
-            audio.src = url;
-            
-            // Přidání indikace načítání
-            audio.addEventListener("waiting", () => {
-                document.getElementById("loadingMessage").style.display = "block";
-            });
-            audio.addEventListener("canplay", () => {
-                document.getElementById("loadingMessage").style.display = "none";
-            });
-        }
+        };
 
         function seek(seconds) {
             const audio = document.getElementById("audioPlayer");
@@ -97,22 +77,6 @@
             a.download = "notes.txt";
             a.click();
         }
-
-        function copyNotes() {
-            let notes = "";
-            document.querySelectorAll("#notesList li").forEach(note => {
-                notes += note.textContent + "\n";
-            });
-            
-            navigator.clipboard.writeText(notes).then(() => {
-                alert("Poznámky byly zkopírovány do schránky!");
-            }).catch(err => {
-                console.error("Chyba při kopírování:", err);
-                alert("Nepodařilo se zkopírovat poznámky.");
-            });
-        }
     </script>
-    
-    <p id="loadingMessage" style="display: none; color: red;">Načítám soubor...</p>
 </body>
 </html>
