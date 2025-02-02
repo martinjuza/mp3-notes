@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MP3 Přehrávač s poznámkami</title>
+    <title>Generátor odkazu pro přehrávač</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        textarea { width: 80%; height: 100px; margin-top: 10px; }
-        button { margin: 5px; padding: 10px; }
+        input { width: 80%; padding: 10px; margin: 10px 0; }
+        button { padding: 10px; margin: 5px; }
     </style>
 </head>
 <body>
@@ -26,7 +26,7 @@
             let input = document.getElementById("dropboxUrl").value;
             if (input.includes("dropbox.com")) {
                 input = input.replace("dl=0", "raw=1");
-                const playerUrl = window.location.origin + window.location.pathname.replace("index.html", "player.html") + "?mp3=" + encodeURIComponent(input);
+                const playerUrl = window.location.origin + "/mp3-notes/player.html?mp3=" + encodeURIComponent(input);
                 document.getElementById("generatedLink").value = playerUrl;
             } else {
                 alert("Vložte platný Dropbox odkaz.");
