@@ -6,105 +6,85 @@
     <title>Přehrávač MP3 s poznámkami</title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        audio { margin: 20px 0; }
+        audio { width: 80%; margin: 20px 0; }
         button { margin: 5px; padding: 10px; }
-        textarea { margin: 10px 0; }
+        textarea { width: 80%; height: 100px; margin: 10px 0; }
     </style>
 </head>
 <body>
-    <h1 id="fileName">Přehrávač MP3 s poznámkami</h1>
-    <audio id="audioPlayer" controls style="width: 100%;"></audio>
+    <h1 id="fileTitle">Přehráváte:</h1>
+    <audio id="audioPlayer" controls></audio>
     <div>
-        <button onclick="seekBackward()">-10s</button>
-        <button onclick="playPause()">Play/Pause</button>
-        <button onclick="seekForward()">+10s</button>
-        <button onclick="changePlaybackRate(1)">1x</button>
-        <button onclick="changePlaybackRate(1.5)">1.5x</button>
-        <button onclick="changePlaybackRate(2)">2x</button>
+        <button onclick="skipTime(-10)">-10s</button>
+        <button onclick="setPlaybackRate(1)">1x</button>
+        <button onclick="setPlaybackRate(1.5)">1.5x</button>
+        <button onclick="setPlaybackRate(2)">2x</button>
+        <button onclick="skipTime(10)">+10s</button>
     </div>
     <h3>Poznámky</h3>
-    <textarea id="noteInput" placeholder="Zadejte poznámku..." style="width: 100%; height: 100px;"></textarea>
+    <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
+    <br>
     <button onclick="addNote()">Přidat poznámku</button>
     <button onclick="exportNotes()">Exportovat poznámky</button>
     <button onclick="copyNotes()">Kopírovat poznámky</button>
     <ul id="notesList"></ul>
-
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        const mp3Url = urlParams.get('mp3');
-        const audioPlayer = document.getElementById('audioPlayer');
-        const fileNameDisplay = document.getElementById('fileName');
+        const audioPlayer = document.getElementById("audioPlayer");
+        const fileTitle = document.getElementById("fileTitle");
 
+        // Načtení MP3 souboru z URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const mp3Url = urlParams.get("mp3");
         if (mp3Url) {
             audioPlayer.src = mp3Url;
-            const fileName = decodeURIComponent(mp3Url.split('/').pop().split('?')[0]);
-            fileNameDisplay.textContent = `Přehráváte: ${fileName}`;
-        } else {
-            fileNameDisplay.textContent = 'Žádný MP3 soubor nenalezen.';
+            const fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
+            fileTitle.textContent = `Přehráváte: ${fileName}`;
         }
 
-        const notes = [];
+        // Funkce pro skákání v čase
+        function skipTime(seconds) {
+            audioPlayer.currentTime += seconds;
+        }
 
+        // Funkce pro nastavení rychlosti přehrávání
+        function setPlaybackRate(rate) {
+            audioPlayer.playbackRate = rate;
+        }
+
+        // Přidání poznámky
         function addNote() {
-            const noteInput = document.getElementById('noteInput');
-            const currentTime = audioPlayer.currentTime;
-            if (noteInput.value.trim() !== '') {
-                notes.push({ time: formatTime(currentTime), text: noteInput.value });
-                noteInput.value = '';
-                renderNotes();
+            const noteInput = document.getElementById("noteInput");
+            const notesList = document.getElementById("notesList");
+            if (noteInput.value.trim() !== "") {
+                const time = new Date(audioPlayer.currentTime * 1000).toISOString().substr(11, 8);
+                const note = document.createElement("li");
+                note.textContent = `[${time}] ${noteInput.value}`;
+                notesList.appendChild(note);
+                noteInput.value = "";
             }
         }
 
-        function renderNotes() {
-            const notesList = document.getElementById('notesList');
-            notesList.innerHTML = '';
-            notes.forEach((note) => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `[${note.time}] ${note.text}`;
-                notesList.appendChild(listItem);
-            });
-        }
-
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
+        // Export poznámek
         function exportNotes() {
-            const exportedNotes = notes.map((note) => `[${note.time}] ${note.text}`).join('\n');
-            const blob = new Blob([exportedNotes], { type: 'text/plain' });
-            const link = document.createElement('a');
+            const notesList = document.getElementById("notesList");
+            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+            const blob = new Blob([notes], { type: "text/plain" });
+            const link = document.createElement("a");
             link.href = URL.createObjectURL(blob);
-            link.download = 'notes.txt';
+            link.download = "notes.txt";
             link.click();
         }
 
+        // Kopírování poznámek
         function copyNotes() {
-            const exportedNotes = notes.map((note) => `[${note.time}] ${note.text}`).join('\n');
-            navigator.clipboard.writeText(exportedNotes).then(() => {
-                alert('Poznámky byly zkopírovány do schránky!');
+            const notesList = document.getElementById("notesList");
+            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+            navigator.clipboard.writeText(notes).then(() => {
+                alert("Poznámky zkopírovány do schránky!");
+            }).catch(err => {
+                console.error("Chyba při kopírování:", err);
+                alert("Nepodařilo se zkopírovat poznámky.");
             });
-        }
-
-        function seekBackward() {
-            audioPlayer.currentTime = Math.max(0, audioPlayer.currentTime - 10);
-        }
-
-        function seekForward() {
-            audioPlayer.currentTime = Math.min(audioPlayer.duration, audioPlayer.currentTime + 10);
-        }
-
-        function playPause() {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-            } else {
-                audioPlayer.pause();
-            }
-        }
-
-        function changePlaybackRate(rate) {
-            audioPlayer.playbackRate = rate;
         }
     </script>
 </body>
