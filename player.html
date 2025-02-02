@@ -11,7 +11,7 @@
     </style>
 </head>
 <body>
-    <h1>Přehrávač MP3 s poznámkami</h1>
+    <h1 id="fileTitle">Přehrávač MP3 s poznámkami</h1>
     
     <audio id="audioPlayer" controls style="margin-top: 20px; width: 80%;">
         Váš prohlížeč nepodporuje přehrávání audia.
@@ -34,7 +34,12 @@
             const urlParams = new URLSearchParams(window.location.search);
             const mp3Url = urlParams.get('mp3');
             if (mp3Url) {
-                document.getElementById("audioPlayer").src = decodeURIComponent(mp3Url);
+                const decodedUrl = decodeURIComponent(mp3Url);
+                document.getElementById("audioPlayer").src = decodedUrl;
+                
+                // Získání názvu souboru z URL
+                const fileName = decodedUrl.split('/').pop().split('?')[0];
+                document.getElementById("fileTitle").textContent = "Přehráváte: " + fileName;
             }
         };
 
