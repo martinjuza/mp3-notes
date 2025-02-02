@@ -25,7 +25,6 @@
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
     <br>
     <button onclick="addNote()">Přidat poznámku</button>
-    <button onclick="exportNotes()">Exportovat poznámky</button>
     <button onclick="copyNotes()">Kopírovat poznámky</button>
     <ul id="notesList"></ul>
     <script>
@@ -35,9 +34,10 @@
         // Načtení MP3 souboru z URL
         const urlParams = new URLSearchParams(window.location.search);
         const mp3Url = urlParams.get("mp3");
+        let fileName = "";
         if (mp3Url) {
             audioPlayer.src = mp3Url;
-            const fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
+            fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
             fileTitle.textContent = `Přehráváte: ${fileName}`;
         }
 
@@ -64,22 +64,12 @@
             }
         }
 
-        // Export poznámek
-        function exportNotes() {
-            const notesList = document.getElementById("notesList");
-            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-            const blob = new Blob([notes], { type: "text/plain" });
-            const link = document.createElement("a");
-            link.href = URL.createObjectURL(blob);
-            link.download = "notes.txt";
-            link.click();
-        }
-
         // Kopírování poznámek
         function copyNotes() {
             const notesList = document.getElementById("notesList");
             const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-            navigator.clipboard.writeText(notes).then(() => {
+            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+            navigator.clipboard.writeText(fullText).then(() => {
                 alert("Poznámky zkopírovány do schránky!");
             }).catch(err => {
                 console.error("Chyba při kopírování:", err);
