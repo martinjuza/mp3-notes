@@ -114,3 +114,5 @@ document.querySelectorAll("button").forEach(button => {
         button.click();
     }, { passive: false });
 });
+window.copyNotes = copyNotes;
+
