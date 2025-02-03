@@ -2,6 +2,12 @@ const audioPlayer = document.getElementById("audioPlayer");
 const fileTitleDisplay = document.getElementById("fileTitleDisplay");
 const noteInput = document.getElementById("noteInput");
 
+const audioPlayer = document.getElementById("audioPlayer");
+const currentTimeEl = document.getElementById("currentTime");
+const totalTimeEl = document.getElementById("totalTime");
+const progressBar = document.getElementById("progressBar");
+
+
 const urlParams = new URLSearchParams(window.location.search);
 const mp3Url = urlParams.get("mp3");
 let fileName = "";
@@ -26,6 +32,37 @@ function togglePlayPause() {
         audioPlayer.pause();
     }
 }
+
+// Formátování času na hh:mm:ss
+function formatTime(seconds) {
+    const hrs = Math.floor(seconds / 3600);
+    const mins = Math.floor((seconds % 3600) / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${hrs.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+}
+
+// Aktualizace času a posuvníku
+audioPlayer.addEventListener("timeupdate", () => {
+    const currentTime = audioPlayer.currentTime;
+    const duration = audioPlayer.duration;
+
+    // Nastavení aktuálního času a celkového času
+    currentTimeEl.textContent = formatTime(currentTime);
+    totalTimeEl.textContent = `/ ${formatTime(duration)}`;
+
+    // Aktualizace posuvníku
+    progressBar.value = (currentTime / duration) * 100;
+});
+
+// Přetáčení při pohybu posuvníkem
+progressBar.addEventListener("input", () => {
+    const duration = audioPlayer.duration;
+    const newTime = (progressBar.value / 100) * duration;
+
+    // Aktualizace času přehrávače
+    audioPlayer.currentTime = newTime;
+});
+
 
 function addNote() {
     if (noteInput.value.trim() !== "") {
