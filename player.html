@@ -54,7 +54,7 @@
         if (mp3Url) {
             audioPlayer.src = mp3Url;
             fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
-            fileTitle.textContent = `Přehráváte: ${fileName}`;
+            fileTitle.textContent = `${fileName}`;
         }
 
         function skipTime(seconds) {
