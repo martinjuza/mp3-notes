@@ -5,9 +5,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generátor odkazu pro přehrávač</title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin: 20px; }
-        input, button { margin: 10px 0; padding: 10px; font-size: 16px; }
-        button { cursor: pointer; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        input, button {
+            margin: 10px 0;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -27,17 +37,55 @@
     <button onclick="sendEmail('klara.juzova@krutart.cz')">Poslat Kláře</button>
 
     <script>
-        function generatePlayerLink() {
+        // Bitly API token
+        const BITLY_TOKEN = "d30a048c8d4759646e30b96a6952e2b04e0b297f";
+
+        // EmailJS API parameters
+        const EMAILJS_SERVICE_ID = "service_1zb4g73";
+        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
+        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs"; // Tvůj veřejný klíč
+
+        // Zkrácení odkazu přes Bitly API
+        async function shortenLink(longUrl) {
+            try {
+                const response = await fetch("https://api-ssl.bitly.com/v4/shorten", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${BITLY_TOKEN}`,
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({ long_url: longUrl }),
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    return data.link; // Zkrácený odkaz
+                } else {
+                    const error = await response.text();
+                    console.error("Bitly API chyba:", error);
+                    return longUrl; // Vrať původní odkaz při chybě
+                }
+            } catch (error) {
+                console.error("Chyba při připojení k Bitly API:", error);
+                return longUrl; // Vrať původní odkaz při chybě
+            }
+        }
+
+        // Generování odkazu pro přehrávač
+        async function generatePlayerLink() {
             let input = document.getElementById("dropboxUrl").value;
             if (input.includes("dropbox.com")) {
                 input = input.replace("dl=0", "raw=1");
                 const playerUrl = window.location.origin + "/mp3-notes/player.html?mp3=" + encodeURIComponent(input);
-                document.getElementById("generatedLink").value = playerUrl;
+
+                const shortenedLink = await shortenLink(playerUrl);
+                document.getElementById("generatedLink").value = shortenedLink;
             } else {
                 alert("Vložte platný Dropbox odkaz.");
             }
         }
 
+        // Kopírování odkazu do schránky
         function copyGeneratedLink() {
             const generatedLink = document.getElementById("generatedLink");
             generatedLink.select();
@@ -49,14 +97,12 @@
             });
         }
 
+        // Odesílání e-mailu přes EmailJS
         async function sendEmail(recipient) {
-            const serviceID = "service_1zb4g73";
-            const templateID = "template_9epmozc";
-            const userID = "PSTcucLXaEZGT6jCs"; // Veřejný klíč
             const messageLink = document.getElementById("generatedLink").value;
 
             if (!messageLink) {
-                alert("Prosím, nejprve vygenerujte odkaz.");
+                alert("Nejprve vygenerujte odkaz.");
                 return;
             }
 
@@ -72,9 +118,9 @@
                         "Content-Type": "application/json",
                     },
                     body: JSON.stringify({
-                        service_id: serviceID,
-                        template_id: templateID,
-                        user_id: userID,
+                        service_id: EMAILJS_SERVICE_ID,
+                        template_id: EMAILJS_TEMPLATE_ID,
+                        user_id: EMAILJS_USER_ID,
                         template_params: templateParams,
                     }),
                 });
