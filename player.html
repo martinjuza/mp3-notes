@@ -16,6 +16,7 @@
             width: 100%; 
             margin: 20px 0; 
             border-radius: 10px;
+            background-color: #ffffff;
         }
         .btn-row { 
             display: flex; 
@@ -33,7 +34,7 @@
             border: none; 
             border-radius: 8px; 
             cursor: pointer; 
-            user-select: none; 
+            user-select: none;
             touch-action: manipulation;
         }
         .btn-small:active, .btn-large:active, .note-btn:active {
@@ -63,9 +64,6 @@
         }
         h1 { 
             font-size: 1.5em; 
-            word-wrap: break-word; 
-            white-space: normal; 
-            overflow-wrap: break-word; 
             max-width: 90%; 
             margin: auto; 
             color: #333;
@@ -77,31 +75,32 @@
     <audio id="audioPlayer" controls></audio>
     
     <div class="btn-row">
-        <button class="btn-small" data-rate="1">1x</button>
-        <button class="btn-small" data-rate="1.25">1.25x</button>
-        <button class="btn-small" data-rate="1.5">1.5x</button>
-        <button class="btn-small" data-rate="1.75">1.75x</button>
-        <button class="btn-small" data-rate="2">2x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
+        <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
     </div>
     
     <div class="btn-row">
-        <button class="btn-large" data-skip="-10">⏪ -10s</button>
-        <button class="btn-large" id="playPause">▶️⏸ Start/Stop</button>
-        <button class="btn-large" data-skip="10">⏩ +10s</button>
+        <button class="btn-large" onclick="skipTime(-10)">⏪ -10s</button>
+        <button class="btn-large" onclick="togglePlayPause()">▶️⏸ Start/Stop</button>
+        <button class="btn-large" onclick="skipTime(10)">⏩ +10s</button>
     </div>
     
     <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
     <br>
-    <button class="note-btn" id="addNote">📌 Přidat poznámku</button>
+    <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
+    <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
     <ul id="notesList"></ul>
     
     <script>
         const audioPlayer = document.getElementById("audioPlayer");
         const fileTitleDisplay = document.getElementById("fileTitleDisplay");
         const noteInput = document.getElementById("noteInput");
-        const playPauseButton = document.getElementById("playPause");
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const mp3Url = urlParams.get("mp3");
         let fileName = "";
@@ -111,41 +110,12 @@
             fileTitleDisplay.textContent = fileName;
         }
 
-        // Přidání event listenerů pro tlačítka
-        document.querySelectorAll(".btn-small").forEach(button => {
-            button.addEventListener("click", () => setPlaybackRate(button.dataset.rate));
-            button.addEventListener("touchstart", event => {
-                event.preventDefault();
-                setPlaybackRate(button.dataset.rate);
-            });
-        });
-
-        document.querySelectorAll(".btn-large").forEach(button => {
-            button.addEventListener("click", () => skipTime(parseFloat(button.dataset.skip)));
-            button.addEventListener("touchstart", event => {
-                event.preventDefault();
-                skipTime(parseFloat(button.dataset.skip));
-            });
-        });
-
-        playPauseButton.addEventListener("click", togglePlayPause);
-        playPauseButton.addEventListener("touchstart", event => {
-            event.preventDefault();
-            togglePlayPause();
-        });
-
-        document.getElementById("addNote").addEventListener("click", addNote);
-        document.getElementById("addNote").addEventListener("touchstart", event => {
-            event.preventDefault();
-            addNote();
-        });
-
         function skipTime(seconds) {
             audioPlayer.currentTime += seconds;
         }
 
         function setPlaybackRate(rate) {
-            audioPlayer.playbackRate = parseFloat(rate);
+            audioPlayer.playbackRate = rate;
         }
         
         function togglePlayPause() {
@@ -166,20 +136,49 @@
                 navigator.vibrate(50);
             }
         }
-        
-        noteInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                addNote();
-            }
-        });
 
-        // Zabránění dvojitému klepnutí a zoomování
-        document.addEventListener("touchstart", function(e) {
-            if (e.target.tagName === "BUTTON") {
-                e.preventDefault();
-            }
-        }, { passive: false });
+        function copyNotes() {
+            const notesList = document.getElementById("notesList");
+            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+            navigator.clipboard.writeText(fullText).then(() => {
+                alert("Poznámky zkopírovány do schránky!");
+            }).catch(() => {
+                alert("Nepodařilo se zkopírovat poznámky.");
+            });
+        }
+
+        async function sendNotesByEmail() {
+            const notesList = document.getElementById("notesList");
+            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+            
+            const templateParams = {
+                recipient: "martin.juza@krutart.cz",
+                message: fullText,
+            };
+
+            await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    service_id: "service_1zb4g73",
+                    template_id: "template_9ktlbtl",
+                    user_id: "PSTcucLXaEZGT6jCs",
+                    template_params: templateParams,
+                }),
+            });
+
+            alert("Poznámky odeslány e-mailem!");
+        }
+
+        // Oprava tlačítek na iPhonech
+        document.querySelectorAll("button").forEach(button => {
+            button.addEventListener("touchstart", event => {
+                event.preventDefault();
+                button.click();
+            }, { passive: false });
+        });
 
     </script>
 </body>
