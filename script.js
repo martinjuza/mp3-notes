@@ -46,23 +46,6 @@ noteInput.addEventListener("keydown", function(event) {
     }
 });
 
-// ✅ 100% funkční kopírování na iPhonech
-function copyNotes() {
-    const notesList = document.getElementById("notesList");
-    const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-    const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-
-    const textArea = document.createElement("textarea");
-    textArea.value = fullText;
-    document.body.appendChild(textArea);
-    textArea.select();
-    textArea.setSelectionRange(0, 99999); // Pro jistotu na mobilních zařízeních
-    document.execCommand("copy");
-    document.body.removeChild(textArea);
-
-    alert("Zkopírováno!");
-}
-
 // ✅ Odesílání poznámek e-mailem přes EmailJS
 async function sendNotesByEmail() {
     const notesList = document.getElementById("notesList");
