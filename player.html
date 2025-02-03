@@ -29,10 +29,11 @@
     <textarea id="noteInput" placeholder="Zadejte poznámku, enterem potvrďte..."></textarea>
     <br>
 
-    <!-- Kopírování a odesílání poznámek vedle sebe -->
+    <!-- Kopírování, odesílání a hlasové ovládání vedle sebe -->
     <div class="btn-row">
         <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
         <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+        <button class="note-btn" onclick="startVoiceControl()">🎙️ Hlasové ovládání</button>
     </div>
 
     <ul id="notesList"></ul>
@@ -127,6 +128,34 @@
             } catch (error) {
                 alert("Nepodařilo se odeslat poznámky.");
             }
+        }
+
+        // ✅ Hlasové ovládání pro přidávání poznámek
+        function startVoiceControl() {
+            const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+            recognition.lang = "cs-CZ"; // Nastavení češtiny
+            recognition.interimResults = false;
+
+            recognition.start();
+            alert("Hlasové ovládání aktivní. Řekněte 'Poznámka: [vaše poznámka]'");
+
+            recognition.addEventListener("result", (event) => {
+                const command = event.results[0][0].transcript.toLowerCase();
+
+                if (command.startsWith("poznámka")) {
+                    const noteText = command.replace("poznámka", "").trim();
+                    if (noteText) {
+                        noteInput.value = noteText;
+                        addNote();
+                        alert(`Poznámka přidána: "${noteText}"`);
+                    }
+                }
+            });
+
+            recognition.addEventListener("error", (event) => {
+                alert("Hlasové ovládání nefunguje. Zkuste to znovu.");
+                console.error(event.error);
+            });
         }
     </script>
 </body>
