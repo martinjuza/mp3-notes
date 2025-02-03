@@ -1,32 +1,120 @@
-<body>
-    <div class="container">
-        <h1 id="fileTitle">Přehráváte:</h1>
-        <audio id="audioPlayer" controls></audio>
+/* Základní styl pro stránku */
+body {
+    font-family: 'Poppins', sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #ff0050;
+    color: #ffffff;
+    text-align: center;
+    overflow-x: hidden;
+}
 
-        <!-- Rychlosti přehrávání -->
-        <div class="btn-row">
-            <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
-            <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
-            <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
-            <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
-            <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
-        </div>
+/* Hlavní nadpis */
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #ffffff;
+    word-wrap: break-word;
+}
 
-        <!-- Přetáčení a play/pause -->
-        <div class="btn-row">
-            <button class="btn-large" onclick="skipTime(-10)">⏪ -10s</button>
-            <button class="btn-large" onclick="togglePlayPause()">▶️⏸</button>
-            <button class="btn-large" onclick="skipTime(10)">⏩ +10s</button>
-        </div>
+/* Audio přehrávač */
+audio {
+    width: 100%;
+    margin: 20px 0;
+    border-radius: 12px;
+    background-color: #ffffff;
+}
 
-        <textarea id="noteInput" placeholder="Zadejte poznámku, enterem potvrďte..."></textarea>
+/* Kontejner pro sjednocení šířek */
+.container {
+    max-width: 90%; /* Šířka 90 % obrazovky */
+    margin: 0 auto;
+}
 
-        <!-- Kopírování a odesílání poznámek -->
-        <div class="btn-row">
-            <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
-            <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
-        </div>
+/* Flexbox pro tlačítka */
+.btn-row {
+    display: flex;
+    justify-content: space-between; /* Zarovná tlačítka rovnoměrně */
+    margin: 15px 0;
+}
 
-        <ul id="notesList"></ul>
-    </div>
-</body>
+/* Tlačítka */
+button {
+    font-size: 16px;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+    flex: 1; /* Stejná šířka pro všechna tlačítka */
+    margin: 0 5px;
+}
+
+button:active {
+    transform: scale(0.95);
+}
+
+/* Menší tlačítka */
+.btn-small {
+    background-color: #005eff;
+    color: #ffffff;
+}
+
+.btn-small:hover {
+    background-color: #0041c4;
+}
+
+/* Větší tlačítka */
+.btn-large {
+    background-color: #ffffff;
+    color: #ff0050;
+}
+
+.btn-large:hover {
+    background-color: #ffe6eb;
+}
+
+/* Textové pole */
+textarea {
+    width: 100%; /* Přizpůsobí se šířce kontejneru */
+    max-width: 100%;
+    height: 100px;
+    border: none;
+    border-radius: 15px;
+    padding: 15px;
+    font-size: 16px;
+    color: #ff0050;
+    background-color: #ffffff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    margin: 15px 0;
+}
+
+/* Tlačítka pro poznámky */
+.note-btn {
+    background-color: #ffffff;
+    color: #ff0050;
+    font-size: 16px;
+    margin: 0 5px;
+}
+
+.note-btn:hover {
+    background-color: #ffe6eb;
+}
+
+/* Seznam poznámek */
+ul {
+    max-width: 100%; /* Zarovnání na šířku tlačítek */
+    margin: 20px auto;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+}
+
+li {
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+    color: #ff0050;
+    border-radius: 12px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
