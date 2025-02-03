@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Generátor odkazu pro přehrávač</title>
+    <script src="https://cdn.emailjs.com/dist/email.min.js"></script>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; }
-        input { width: 80%; padding: 10px; margin: 10px 0; }
-        button { padding: 10px; margin: 5px; }
+        input, select, button { width: 80%; padding: 10px; margin: 10px 0; }
+        button { cursor: pointer; }
     </style>
 </head>
 <body>
-    <h1>Vygenerujte odkaz pro autora</h1>
+    <h1>Vygenerujte a pošlete odkaz pro autora</h1>
     
     <label for="dropboxUrl">Vložte odkaz na MP3 soubor z Dropboxu:</label>
     <input type="text" id="dropboxUrl" placeholder="Vložte Dropbox odkaz" style="width: 80%;">
@@ -20,8 +21,18 @@
     <h3>Odkaz pro autora:</h3>
     <input type="text" id="generatedLink" style="width: 80%;" readonly>
     <button onclick="copyGeneratedLink()">Kopírovat odkaz</button>
-    
+
+    <h3>Poslat e-mail:</h3>
+    <button onclick="sendEmail('martin.juza@krutart.cz')">Poslat Martinovi</button>
+    <button onclick="sendEmail('juliana.silvie@krutart.cz')">Poslat Julianě</button>
+    <button onclick="sendEmail('klara.juzova@krutart.cz')">Poslat Kláře</button>
+
     <script>
+        // Inicializace EmailJS
+        (function () {
+            emailjs.init('PSTcucLXaEZGT6jCs'); // Používáme Public API Key
+        })();
+
         function generatePlayerLink() {
             let input = document.getElementById("dropboxUrl").value;
             if (input.includes("dropbox.com")) {
@@ -42,6 +53,28 @@
                 console.error("Chyba při kopírování:", err);
                 alert("Nepodařilo se zkopírovat odkaz.");
             });
+        }
+
+        function sendEmail(recipient) {
+            const link = document.getElementById("generatedLink").value;
+
+            if (!link) {
+                alert("Nejprve vygenerujte odkaz!");
+                return;
+            }
+
+            const templateParams = {
+                to_email: recipient,
+                message: `Ahoj,\n\nposlechni si nový díl Pitche a pošli poznámky.\n\n${link}\n\nDíky!`
+            };
+
+            emailjs.send('service_1zb4g73', 'template_9epmozc', templateParams)
+                .then(response => {
+                    alert(`E-mail byl úspěšně odeslán ${recipient}!`);
+                }, error => {
+                    console.error("Chyba při odesílání e-mailu:", error);
+                    alert("Nepodařilo se odeslat e-mail.");
+                });
         }
     </script>
 </body>
