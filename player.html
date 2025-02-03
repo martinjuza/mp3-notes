@@ -10,13 +10,29 @@
             text-align: center;
             padding: 20px;
             margin: 0;
-            background: linear-gradient(180deg, #ffffff, #f1f1f1);
+            background: linear-gradient(180deg, #e8f5e9, #fce4ec);
         }
-        audio {
+        .custom-progress {
+            position: relative;
+            width: 90%;
+            margin: 20px auto;
+        }
+        .progress-bar {
             width: 100%;
-            margin: 20px 0;
-            border-radius: 12px;
-            background-color: #eaeaea;
+            height: 10px;
+            background-color: #c8e6c9;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .progress {
+            height: 10px;
+            background-color: #81c784;
+            width: 0%;
+        }
+        .timecode {
+            text-align: right;
+            font-size: 14px;
+            color: #616161;
         }
         .btn-row {
             display: flex;
@@ -29,7 +45,7 @@
             flex: 1;
             padding: 10px;
             font-size: 14px;
-            background: linear-gradient(180deg, #007bff, #0056b3);
+            background: linear-gradient(180deg, #aed581, #7cb342);
             color: white;
             border: none;
             border-radius: 6px;
@@ -37,13 +53,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .btn-small:active {
-            background: #004085;
+            background: #558b2f;
         }
         .btn-large {
             flex: 1;
             padding: 15px;
             font-size: 18px;
-            background: linear-gradient(180deg, #007bff, #0056b3);
+            background: linear-gradient(180deg, #f06292, #c2185b);
             color: white;
             border: none;
             border-radius: 8px;
@@ -51,7 +67,7 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .btn-large:active {
-            background: #004085;
+            background: #880e4f;
         }
         textarea {
             width: 90%;
@@ -93,7 +109,7 @@
             margin: 10px auto;
             padding: 15px;
             font-size: 16px;
-            background: linear-gradient(180deg, #007bff, #0056b3);
+            background: linear-gradient(180deg, #f06292, #c2185b);
             color: white;
             border: none;
             border-radius: 8px;
@@ -101,13 +117,18 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .note-btn:active {
-            background: #004085;
+            background: #880e4f;
         }
     </style>
 </head>
 <body>
     <h1 id="fileTitleDisplay"></h1>
-    <audio id="audioPlayer" controls></audio>
+    <div class="custom-progress">
+        <div class="progress-bar">
+            <div class="progress" id="progress"></div>
+        </div>
+        <div class="timecode" id="timecode">00:00:00</div>
+    </div>
     
     <div class="btn-row">
         <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
@@ -132,7 +153,9 @@
     <ul id="notesList"></ul>
     
     <script>
-        const audioPlayer = document.getElementById("audioPlayer");
+        const audioPlayer = document.createElement("audio");
+        const progress = document.getElementById("progress");
+        const timecode = document.getElementById("timecode");
         const fileTitleDisplay = document.getElementById("fileTitleDisplay");
         const noteInput = document.getElementById("noteInput");
         
@@ -149,6 +172,12 @@
             fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
             fileTitleDisplay.textContent = fileName;
         }
+
+        audioPlayer.addEventListener("timeupdate", () => {
+            const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progress.style.width = percent + "%";
+            timecode.textContent = new Date(audioPlayer.currentTime * 1000).toISOString().substr(11, 8);
+        });
 
         function skipTime(seconds) {
             audioPlayer.currentTime += seconds;
@@ -173,7 +202,6 @@
                 note.textContent = `[${time}] ${noteInput.value}`;
                 document.getElementById("notesList").appendChild(note);
                 noteInput.value = "";
-                navigator.vibrate(50);
             }
         }
         
