@@ -96,11 +96,35 @@
             alert("Poznámky zkopírovány!");
         }
 
-        function sendNotesByEmail() {
+       async function sendNotesByEmail() {
             const notesList = document.getElementById("notesList");
             const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
             const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-            alert("Zatím není implementováno odesílání e-mailů.");
+            
+            const templateParams = {
+                recipient: RECIPIENT_EMAIL,
+                message: fullText,
+            };
+
+            try {
+                const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        service_id: EMAILJS_SERVICE_ID,
+                        template_id: EMAILJS_TEMPLATE_ID,
+                        user_id: EMAILJS_USER_ID,
+                        template_params: templateParams,
+                    }),
+                });
+                if (response.ok) {
+                    alert("Poznámky odeslány e-mailem!");
+                } else {
+                    alert("Nepodařilo se odeslat poznámky.");
+                }
+            } catch (error) {
+                alert("Nepodařilo se odeslat poznámky.");
+            }
         }
     </script>
 </body>
