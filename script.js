@@ -38,32 +38,30 @@ function addNote() {
     }
 }
 
-// ✅ Enter přidává poznámku, Shift+Enter dělá nový řádek
-noteInput.addEventListener("keyup", function(event) {
+// ✅ Enter na iPhonech přidává poznámku správně
+noteInput.addEventListener("keydown", function(event) {
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         addNote();
     }
 });
 
-// ✅ Oprava kopírování poznámek na iPhonech
-function copyNotes() {
+// ✅ Kopírování poznámek s fallback metodou pro iPhony
+async function copyNotes() {
     const notesList = document.getElementById("notesList");
     const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
     const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(fullText).then(() => {
-            alert("Poznámky zkopírovány do schránky!");
-        }).catch(() => {
-            fallbackCopyText(fullText);
-        });
-    } else {
+    try {
+        await navigator.clipboard.writeText(fullText);
+        alert("Poznámky zkopírovány do schránky!");
+    } catch (err) {
+        console.warn("Standardní metoda selhala, používám fallback.");
         fallbackCopyText(fullText);
     }
 }
 
-// ✅ Fallback metoda pro iPhony a starší prohlížeče
+// ✅ Fallback kopírování pro iPhony a starší prohlížeče
 function fallbackCopyText(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
@@ -73,6 +71,33 @@ function fallbackCopyText(text) {
     document.execCommand("copy");
     document.body.removeChild(textArea);
     alert("Poznámky zkopírovány do schránky! (fallback metoda)");
+}
+
+// ✅ Odesílání poznámek e-mailem přes EmailJS
+async function sendNotesByEmail() {
+    const notesList = document.getElementById("notesList");
+    const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+    const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+
+    try {
+        await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                service_id: "service_1zb4g73",
+                template_id: "template_9ktlbtl",
+                user_id: "PSTcucLXaEZGT6jCs",
+                template_params: {
+                    recipient: "martin.juza@krutart.cz",
+                    message: fullText,
+                },
+            }),
+        });
+        alert("Poznámky odeslány e-mailem!");
+    } catch (error) {
+        alert("Chyba při odesílání e-mailu.");
+        console.error("Email error:", error);
+    }
 }
 
 // ✅ Oprava tlačítek na iPhonech
