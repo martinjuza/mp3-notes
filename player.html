@@ -29,38 +29,13 @@
     <br>
     <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
     <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
 
-    <!-- Zde přímo v HTML tlačítko s kopírováním -->
-    <button class="note-btn" onclick="copyNotesHtml()">📋 Kopírovat poznámky</button>
-
-    <!-- Skrytý input pro spolehlivé kopírování -->
+    <!-- Skrytý input pro fallback kopírování -->
     <textarea id="clipboardHelper" style="opacity:0; position:absolute; left:-9999px;"></textarea>
 
     <ul id="notesList"></ul>
 
     <script src="script.js"></script>
-
-    <script>
-        function copyNotesHtml() {
-            const notesList = document.getElementById("notesList");
-            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-
-            const clipboardHelper = document.getElementById("clipboardHelper");
-            clipboardHelper.value = fullText;
-            clipboardHelper.style.display = "block";
-            clipboardHelper.select();
-            clipboardHelper.setSelectionRange(0, 99999);
-
-            const success = document.execCommand("copy");
-            clipboardHelper.style.display = "none";
-
-            if (success) {
-                alert("Zkopírovánhovno!");
-            } else {
-                alert("Kopírování selhalo, zkus ručně.");
-            }
-        }
-    </script>
 </body>
 </html>
