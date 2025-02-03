@@ -63,7 +63,8 @@ button {
 
 /* Textové pole zarovnané na šířku tlačítek */
 textarea {
-    width: calc(120px * 3 + 20px * 2); /* 3 tlačítka + mezery */
+    width: calc(120px * 3 + 20px * 2); /* Přesná šířka tlačítek a jejich mezer */
+    max-width: 90%; /* Přizpůsobí se menším obrazovkám */
     height: 80px;
     font-size: 16px;
     margin: 10px auto;
