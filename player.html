@@ -6,11 +6,12 @@
     <title id="fileTitle"></title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'Roboto', sans-serif;
             text-align: center;
             padding: 20px;
             margin: 0;
-            background: linear-gradient(180deg, #e8f5e9, #fce4ec);
+            background: linear-gradient(180deg, #f0fff4, #fef9ff);
+            overflow: hidden;
         }
         .custom-progress {
             position: relative;
@@ -19,20 +20,22 @@
         }
         .progress-bar {
             width: 100%;
-            height: 10px;
-            background-color: #c8e6c9;
-            border-radius: 5px;
+            height: 12px;
+            background-color: #e0e0e0;
+            border-radius: 6px;
             overflow: hidden;
+            cursor: pointer;
         }
         .progress {
-            height: 10px;
-            background-color: #81c784;
+            height: 12px;
+            background: linear-gradient(90deg, #9ae6b4, #68d391);
             width: 0%;
         }
         .timecode {
-            text-align: right;
+            text-align: center;
             font-size: 14px;
-            color: #616161;
+            color: #4a5568;
+            margin-top: 5px;
         }
         .btn-row {
             display: flex;
@@ -45,7 +48,7 @@
             flex: 1;
             padding: 10px;
             font-size: 14px;
-            background: linear-gradient(180deg, #aed581, #7cb342);
+            background: linear-gradient(180deg, #4fd1c5, #38b2ac);
             color: white;
             border: none;
             border-radius: 6px;
@@ -53,13 +56,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .btn-small:active {
-            background: #558b2f;
+            background: #2c7a7b;
         }
         .btn-large {
             flex: 1;
             padding: 15px;
             font-size: 18px;
-            background: linear-gradient(180deg, #f06292, #c2185b);
+            background: linear-gradient(180deg, #fc8181, #e53e3e);
             color: white;
             border: none;
             border-radius: 8px;
@@ -67,14 +70,14 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .btn-large:active {
-            background: #880e4f;
+            background: #c53030;
         }
         textarea {
             width: 90%;
             height: 100px;
             margin: 10px 0;
             font-size: 16px;
-            border: 1px solid #ccc;
+            border: 1px solid #cbd5e0;
             border-radius: 6px;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 10px;
@@ -88,7 +91,7 @@
         }
         li {
             padding: 10px;
-            border-bottom: 1px solid #ccc;
+            border-bottom: 1px solid #e2e8f0;
             background-color: #ffffff;
             border-radius: 6px;
             margin-bottom: 5px;
@@ -101,7 +104,7 @@
             overflow-wrap: break-word;
             max-width: 90%;
             margin: auto;
-            color: #333;
+            color: #2d3748;
         }
         .note-btn {
             display: block;
@@ -109,7 +112,7 @@
             margin: 10px auto;
             padding: 15px;
             font-size: 16px;
-            background: linear-gradient(180deg, #f06292, #c2185b);
+            background: linear-gradient(180deg, #63b3ed, #3182ce);
             color: white;
             border: none;
             border-radius: 8px;
@@ -117,13 +120,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .note-btn:active {
-            background: #880e4f;
+            background: #2b6cb0;
         }
     </style>
 </head>
 <body>
     <h1 id="fileTitleDisplay"></h1>
-    <div class="custom-progress">
+    <div class="custom-progress" onclick="seekAudio(event)">
         <div class="progress-bar">
             <div class="progress" id="progress"></div>
         </div>
@@ -253,6 +256,19 @@
                 alert("Nepodařilo se odeslat poznámky.");
             }
         }
+
+        function seekAudio(event) {
+            const progressBar = event.currentTarget;
+            const rect = progressBar.getBoundingClientRect();
+            const offsetX = event.clientX - rect.left;
+            const width = rect.width;
+            const percent = offsetX / width;
+            audioPlayer.currentTime = percent * audioPlayer.duration;
+        }
+
+        document.addEventListener("touchmove", function(e) {
+            e.preventDefault();
+        }, { passive: false });
     </script>
 </body>
 </html>
