@@ -23,7 +23,7 @@
 
     <h3>Poslat e-mail:</h3>
     <button onclick="sendEmail('martin.juza@krutart.cz')">Poslat Martinovi</button><br>
-    <button onclick="sendEmail('juliana.silvie@krutart.cz')">Poslat Julianě</button><br>
+    <button onclick="sendEmail('juliana.silvie@krutart.cz')">Poslat Juliáně</button><br>
     <button onclick="sendEmail('klara.juzova@krutart.cz')">Poslat Kláře</button>
 
     <script>
@@ -53,9 +53,13 @@
             const serviceID = "service_1zb4g73"; // Nahraď svým Service ID
             const templateID = "template_9epmozc"; // Nahraď svým Template ID
             const userID = "PSTcucLXaEZGT6jCs"; // Tvůj veřejný klíč
+
+            const fullLink = document.getElementById("generatedLink").value;
+            const shortLink = "https://kr.link/" + btoa(fullLink).substring(0, 6); // Jednoduché zkrácení pomocí base64
+
             const templateParams = {
                 recipient: recipient,
-                message: document.getElementById("generatedLink").value,
+                message: `Plný odkaz: ${fullLink}\nZkrácený odkaz: ${shortLink}`,
             };
 
             try {
