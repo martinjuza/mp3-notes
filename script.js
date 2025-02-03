@@ -38,40 +38,45 @@ function addNote() {
     }
 }
 
+// ✅ Oprava: Enter přidává poznámku, Shift+Enter dělá nový řádek
+noteInput.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault();
+        addNote();
+    }
+});
+
+// ✅ Oprava kopírování poznámek na iPhonech
 function copyNotes() {
     const notesList = document.getElementById("notesList");
     const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
     const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-    navigator.clipboard.writeText(fullText).then(() => {
-        alert("Poznámky zkopírovány do schránky!");
-    }).catch(() => {
-        alert("Nepodařilo se zkopírovat poznámky.");
-    });
+    
+    // Moderní metoda
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(fullText).then(() => {
+            alert("Poznámky zkopírovány do schránky!");
+        }).catch(() => {
+            fallbackCopyText(fullText);
+        });
+    } else {
+        fallbackCopyText(fullText);
+    }
 }
 
-async function sendNotesByEmail() {
-    const notesList = document.getElementById("notesList");
-    const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-    const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-
-    await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            service_id: "service_1zb4g73",
-            template_id: "template_9ktlbtl",
-            user_id: "PSTcucLXaEZGT6jCs",
-            template_params: {
-                recipient: "martin.juza@krutart.cz",
-                message: fullText,
-            },
-        }),
-    });
-
-    alert("Poznámky odeslány e-mailem!");
+// ✅ Fallback metoda pro iPhony a starší prohlížeče
+function fallbackCopyText(text) {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    document.body.appendChild(textArea);
+    textArea.select();
+    textArea.setSelectionRange(0, 99999);
+    document.execCommand("copy");
+    document.body.removeChild(textArea);
+    alert("Poznámky zkopírovány do schránky! (fallback)");
 }
 
-// Oprava tlačítek na iPhonech
+// ✅ Oprava tlačítek na iPhonech
 document.querySelectorAll("button").forEach(button => {
     button.addEventListener("touchstart", event => {
         event.preventDefault();
