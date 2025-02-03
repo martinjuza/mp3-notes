@@ -34,11 +34,15 @@
     <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
     <ul id="notesList"></ul>
 
-    <!-- Inline JavaScript -->
     <script>
         const audioPlayer = document.getElementById("audioPlayer");
         const fileTitle = document.getElementById("fileTitle");
         const noteInput = document.getElementById("noteInput");
+
+        const EMAILJS_SERVICE_ID = "service_1zb4g73";
+        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
+        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs";
+        const RECIPIENT_EMAIL = "martin.juza@krutart.cz";
 
         const urlParams = new URLSearchParams(window.location.search);
         const mp3Url = urlParams.get("mp3");
@@ -75,7 +79,7 @@
             }
         }
 
-        // ✅ Správná implementace Enter pro přidání poznámky
+        // ✅ Přidávání poznámek Enterem
         noteInput.addEventListener("keydown", function(event) {
             if (event.key === "Enter" && !event.shiftKey) {
                 event.preventDefault();
@@ -96,7 +100,7 @@
             alert("Poznámky zkopírovány!");
         }
 
-       async function sendNotesByEmail() {
+        async function sendNotesByEmail() {
             const notesList = document.getElementById("notesList");
             const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
             const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
@@ -124,6 +128,7 @@
                 }
             } catch (error) {
                 alert("Nepodařilo se odeslat poznámky.");
+                console.error("Chyba:", error);
             }
         }
     </script>
