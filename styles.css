@@ -1,3 +1,4 @@
+/* Základní stylování */
 body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -8,7 +9,7 @@ body {
 h1 {
     font-size: 24px;
     max-width: 90%;
-    margin: auto;
+    margin: 10px auto;
     word-wrap: break-word;
 }
 
@@ -17,6 +18,7 @@ audio {
     margin: 20px 0;
 }
 
+/* Zarovnání tlačítek */
 .btn-row {
     display: flex;
     justify-content: center;
@@ -24,18 +26,22 @@ audio {
     margin: 10px 0;
 }
 
+/* Tlačítka */
 button {
     border: none;
     border-radius: 8px;
     cursor: pointer;
     color: white;
     transition: background-color 0.3s;
+    text-align: center;
 }
 
 .btn-small {
     padding: 10px 15px;
     font-size: 14px;
     background-color: #007bff;
+    flex: 1; /* Zarovná se na šířku ostatních */
+    max-width: 120px;
 }
 
 .btn-small:hover {
@@ -46,33 +52,41 @@ button {
     padding: 15px 20px;
     font-size: 16px;
     background-color: #28a745;
+    flex: 1; /* Zarovná se na šířku ostatních */
+    max-width: 120px;
 }
 
 .btn-large:hover {
     background-color: #218838;
 }
 
+/* Textové pole pro poznámky */
 textarea {
     width: 90%;
     height: 80px;
     font-size: 16px;
-    margin: 10px 0;
+    margin: 10px auto;
     border: 1px solid #ccc;
     border-radius: 8px;
     padding: 10px;
+    display: block;
 }
 
+/* Tlačítka pro poznámky */
 .note-btn {
     background-color: #007bff;
     font-size: 14px;
     padding: 10px 15px;
     margin: 5px;
+    flex: 1;
+    max-width: 120px;
 }
 
 .note-btn:hover {
     background-color: #0056b3;
 }
 
+/* Zarovnání seznamu poznámek */
 ul {
     text-align: left;
     max-width: 90%;
@@ -84,4 +98,14 @@ ul {
 li {
     padding: 8px;
     border-bottom: 1px solid #ccc;
+}
+
+/* Flexbox pro zarovnání textového pole a tlačítek */
+textarea,
+.btn-row,
+.note-btn {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: auto;
 }
