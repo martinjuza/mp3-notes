@@ -38,8 +38,8 @@ function addNote() {
     }
 }
 
-// ✅ Oprava: Enter přidává poznámku, Shift+Enter dělá nový řádek
-noteInput.addEventListener("keydown", function(event) {
+// ✅ Enter přidává poznámku, Shift+Enter dělá nový řádek
+noteInput.addEventListener("keyup", function(event) {
     if (event.key === "Enter" && !event.shiftKey) {
         event.preventDefault();
         addNote();
@@ -51,8 +51,7 @@ function copyNotes() {
     const notesList = document.getElementById("notesList");
     const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
     const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-    
-    // Moderní metoda
+
     if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(fullText).then(() => {
             alert("Poznámky zkopírovány do schránky!");
@@ -73,7 +72,7 @@ function fallbackCopyText(text) {
     textArea.setSelectionRange(0, 99999);
     document.execCommand("copy");
     document.body.removeChild(textArea);
-    alert("Poznámky zkopírovány do schránky! (fallback)");
+    alert("Poznámky zkopírovány do schránky! (fallback metoda)");
 }
 
 // ✅ Oprava tlačítek na iPhonech
