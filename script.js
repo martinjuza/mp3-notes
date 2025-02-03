@@ -46,22 +46,24 @@ noteInput.addEventListener("keydown", function(event) {
     }
 });
 
-// ✅ Kopírování poznámek s fallback metodou pro iPhony
-async function copyNotes() {
+// ✅ Spolehlivé kopírování poznámek (opraveno pro iPhone)
+function copyNotes() {
     const notesList = document.getElementById("notesList");
     const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
     const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
 
-    try {
-        await navigator.clipboard.writeText(fullText);
-        alert("Poznámky zkopírovány do schránky!");
-    } catch (err) {
-        console.warn("Standardní metoda selhala, používám fallback.");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(fullText).then(() => {
+            alert("Zkopírováno!");
+        }).catch(() => {
+            fallbackCopyText(fullText);
+        });
+    } else {
         fallbackCopyText(fullText);
     }
 }
 
-// ✅ Fallback kopírování pro iPhony a starší prohlížeče
+// ✅ Fallback metoda pro iPhone, když clipboard nefunguje
 function fallbackCopyText(text) {
     const textArea = document.createElement("textarea");
     textArea.value = text;
@@ -70,7 +72,7 @@ function fallbackCopyText(text) {
     textArea.setSelectionRange(0, 99999);
     document.execCommand("copy");
     document.body.removeChild(textArea);
-    alert("Poznámky zkopírovány do schránky! (fallback metoda)");
+    alert("Zkopírováno!");
 }
 
 // ✅ Odesílání poznámek e-mailem přes EmailJS
