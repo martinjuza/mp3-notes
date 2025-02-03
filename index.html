@@ -2,141 +2,36 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generátor odkazu pro přehrávač</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 20px;
-        }
-        input, button {
-            margin: 10px 0;
-            padding: 10px;
-            font-size: 16px;
-        }
-        button {
-            cursor: pointer;
-        }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title id="fileTitle"></title>
+    <link rel="stylesheet" href="styles.css"> <!-- ODKAZ NA CSS -->
 </head>
 <body>
-    <h1>Vygenerujte a pošlete odkaz autorovi</h1>
+    <h1 id="fileTitleDisplay"></h1>
+    <audio id="audioPlayer" controls></audio>
 
-    <label for="dropboxUrl">Vložte odkaz na MP3 soubor z Dropboxu:</label><br>
-    <input type="text" id="dropboxUrl" placeholder="Vložte Dropbox odkaz" style="width: 80%;"><br>
-    <button onclick="generatePlayerLink()">Vygenerovat odkaz</button>
+    <div class="btn-row">
+        <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
+        <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
+    </div>
 
-    <h3>Odkaz pro autora:</h3>
-    <input type="text" id="generatedLink" style="width: 80%;" readonly><br>
-    <button onclick="copyGeneratedLink()">Kopírovat odkaz</button>
+    <div class="btn-row">
+        <button class="btn-large" onclick="skipTime(-10)">⏪ -10s</button>
+        <button class="btn-large" onclick="togglePlayPause()">▶️⏸ Start/Stop</button>
+        <button class="btn-large" onclick="skipTime(10)">⏩ +10s</button>
+    </div>
 
-    <h3>Poslat e-mail:</h3>
-    <button onclick="sendEmail('martin.juza@krutart.cz')">Poslat Martinovi</button><br>
-    <button onclick="sendEmail('juliana.silvie@krutart.cz')">Poslat Juliáně</button><br>
-    <button onclick="sendEmail('klara.juzova@krutart.cz')">Poslat Kláře</button>
+    <h3>Poznámky</h3>
+    <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
+    <br>
+    <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
+    <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
+    <ul id="notesList"></ul>
 
-    <script>
-        // Bitly API token
-        const BITLY_TOKEN = "d30a048c8d4759646e30b96a6952e2b04e0b297f";
-
-        // EmailJS API parameters
-        const EMAILJS_SERVICE_ID = "service_1zb4g73";
-        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
-        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs"; // Tvůj veřejný klíč
-
-        // Zkrácení odkazu přes Bitly API
-        async function shortenLink(longUrl) {
-            try {
-                const response = await fetch("https://api-ssl.bitly.com/v4/shorten", {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${BITLY_TOKEN}`,
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({ long_url: longUrl }),
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    return data.link; // Zkrácený odkaz
-                } else {
-                    const error = await response.text();
-                    console.error("Bitly API chyba:", error);
-                    return longUrl; // Vrať původní odkaz při chybě
-                }
-            } catch (error) {
-                console.error("Chyba při připojení k Bitly API:", error);
-                return longUrl; // Vrať původní odkaz při chybě
-            }
-        }
-
-        // Generování odkazu pro přehrávač
-        async function generatePlayerLink() {
-            let input = document.getElementById("dropboxUrl").value;
-            if (input.includes("dropbox.com")) {
-                input = input.replace("dl=0", "raw=1");
-                const playerUrl = window.location.origin + "/mp3-notes/player.html?mp3=" + encodeURIComponent(input);
-
-                const shortenedLink = await shortenLink(playerUrl);
-                document.getElementById("generatedLink").value = shortenedLink;
-            } else {
-                alert("Vložte platný Dropbox odkaz.");
-            }
-        }
-
-        // Kopírování odkazu do schránky
-        function copyGeneratedLink() {
-            const generatedLink = document.getElementById("generatedLink");
-            generatedLink.select();
-            navigator.clipboard.writeText(generatedLink.value).then(() => {
-                alert("Odkaz zkopírován do schránky!");
-            }).catch(err => {
-                console.error("Chyba při kopírování:", err);
-                alert("Nepodařilo se zkopírovat odkaz.");
-            });
-        }
-
-        // Odesílání e-mailu přes EmailJS
-        async function sendEmail(recipient) {
-            const messageLink = document.getElementById("generatedLink").value;
-
-            if (!messageLink) {
-                alert("Nejprve vygenerujte odkaz.");
-                return;
-            }
-
-            const templateParams = {
-                recipient: recipient,
-                message: messageLink,
-            };
-
-            try {
-                const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify({
-                        service_id: EMAILJS_SERVICE_ID,
-                        template_id: EMAILJS_TEMPLATE_ID,
-                        user_id: EMAILJS_USER_ID,
-                        template_params: templateParams,
-                    }),
-                });
-
-                if (response.ok) {
-                    alert("E-mail byl úspěšně odeslán!");
-                } else {
-                    const error = await response.text();
-                    console.error("Chyba při odesílání e-mailu:", error);
-                    alert("Nepodařilo se odeslat e-mail.");
-                }
-            } catch (error) {
-                console.error("Chyba při odesílání e-mailu:", error);
-                alert("Nepodařilo se odeslat e-mail.");
-            }
-        }
-    </script>
+    <script src="script.js"></script> <!-- ODKAZ NA JAVASCRIPT -->
 </body>
 </html>
