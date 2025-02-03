@@ -46,6 +46,40 @@ noteInput.addEventListener("keydown", function(event) {
     }
 });
 
+// ✅ 100% funkční kopírování (Clipboard API + fallback)
+async function copyNotes() {
+    const notesList = document.getElementById("notesList");
+    const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+    const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+
+    try {
+        // 🎯 Nejprve zkusíme Clipboard API (moderní metoda pro iPhone)
+        await navigator.clipboard.writeText(fullText);
+        alert("Zkopírováno!");
+    } catch (err) {
+        console.warn("Clipboard API selhalo, používám fallback:", err);
+        fallbackCopyText(fullText);
+    }
+}
+
+// ✅ Fallback pro starší iPhony a Safari
+function fallbackCopyText(text) {
+    const clipboardHelper = document.getElementById("clipboardHelper");
+    clipboardHelper.value = text;
+    clipboardHelper.style.display = "block";
+    clipboardHelper.select();
+    clipboardHelper.setSelectionRange(0, 99999);
+    
+    const success = document.execCommand("copy");
+    clipboardHelper.style.display = "none";
+
+    if (success) {
+        alert("Zkopírován prdno!");
+    } else {
+        alert("Kopírování sehnddealo, zkuste ručně.");
+    }
+}
+
 // ✅ Odesílání poznámek e-mailem přes EmailJS
 async function sendNotesByEmail() {
     const notesList = document.getElementById("notesList");
