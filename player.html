@@ -12,11 +12,13 @@
             margin: 0;
             background: linear-gradient(180deg, #f0fff4, #fef9ff);
             overflow-y: auto;
+            overscroll-behavior: contain;
         }
         .custom-progress {
             position: relative;
             width: 90%;
             margin: 20px auto;
+            touch-action: none;
         }
         .progress-bar {
             width: 100%;
@@ -25,6 +27,7 @@
             border-radius: 6px;
             overflow: hidden;
             cursor: pointer;
+            position: relative;
         }
         .progress {
             height: 12px;
@@ -40,8 +43,9 @@
             background-color: #4fd1c5;
             border: 3px solid white;
             border-radius: 50%;
-            cursor: pointer;
+            cursor: grab;
             transform: translate(-50%, 0);
+            touch-action: none;
         }
         .timecode {
             text-align: center;
@@ -49,28 +53,14 @@
             color: #4a5568;
             margin-top: 5px;
         }
-        .btn-row {
+        .btn-row, .note-btn-container {
             display: flex;
             justify-content: space-evenly;
-            gap: 10px;
-            margin: 10px 0;
+            width: 90%;
+            margin: 10px auto;
             flex-wrap: wrap;
         }
-        .btn-small {
-            flex: 1;
-            padding: 10px;
-            font-size: 14px;
-            background: linear-gradient(180deg, #4fd1c5, #38b2ac);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .btn-small:active {
-            background: #2c7a7b;
-        }
-        .btn-large {
+        .btn-large, .note-btn {
             flex: 1;
             padding: 15px;
             font-size: 18px;
@@ -80,78 +70,29 @@
             border-radius: 8px;
             cursor: pointer;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            margin-bottom: 5px;
         }
-        .btn-large:active {
+        .btn-large:active, .note-btn:active {
             background: #c53030;
         }
         textarea {
             width: 90%;
             height: 100px;
-            margin: 10px 0;
             font-size: 16px;
-            border: 1px solid #cbd5e0;
             border-radius: 6px;
-            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1);
             padding: 10px;
-        }
-        ul {
-            text-align: left;
-            max-width: 90%;
-            margin: 20px auto;
-            padding: 0;
-            list-style: none;
-        }
-        li {
-            padding: 10px;
-            border-bottom: 1px solid #e2e8f0;
-            background-color: #ffffff;
-            border-radius: 6px;
-            margin-bottom: 5px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-            font-size: 1.5em;
-            word-wrap: break-word;
-            white-space: normal;
-            overflow-wrap: break-word;
-            max-width: 90%;
-            margin: auto;
-            color: #2d3748;
-        }
-        .note-btn {
-            display: block;
-            width: 90%;
-            margin: 10px auto;
-            padding: 15px;
-            font-size: 16px;
-            background: linear-gradient(180deg, #63b3ed, #3182ce);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        .note-btn:active {
-            background: #2b6cb0;
         }
     </style>
 </head>
 <body>
     <h1 id="fileTitleDisplay"></h1>
     <div class="custom-progress">
-        <div class="progress-bar" id="progress-bar" onmousedown="startDrag(event)" ontouchstart="startDrag(event)">
+        <div class="progress-bar" id="progress-bar">
             <div class="progress" id="progress"></div>
             <div class="progress-thumb" id="progress-thumb"></div>
         </div>
         <div class="timecode" id="timecode">00:00 / 00:00</div>
-    </div>
-
-    <div class="btn-row">
-        <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
-        <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
-        <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
-        <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
-        <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
     </div>
 
     <div class="btn-row">
@@ -162,10 +103,11 @@
 
     <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
-    <br>
-    <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
-    <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
-    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
+    <div class="note-btn-container">
+        <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
+        <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+        <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
+    </div>
     <ul id="notesList"></ul>
 
     <script>
@@ -174,77 +116,28 @@
         const progress = document.getElementById("progress");
         const progressThumb = document.getElementById("progress-thumb");
         const timecode = document.getElementById("timecode");
-        const fileTitleDisplay = document.getElementById("fileTitleDisplay");
         const noteInput = document.getElementById("noteInput");
 
-        const EMAILJS_SERVICE_ID = "service_1zb4g73";
-        const EMAILJS_TEMPLATE_ID = "template_9ktlbtl";
-        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs";
-        const RECIPIENT_EMAIL = "martin.juza@krutart.cz";
-
-        const urlParams = new URLSearchParams(window.location.search);
-        const mp3Url = urlParams.get("mp3");
-        let fileName = "";
         let isDragging = false;
 
-        if (mp3Url) {
-            audioPlayer.src = mp3Url;
-            fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
-            fileTitleDisplay.textContent = fileName;
-        }
-
-        audioPlayer.addEventListener("timeupdate", () => {
-            const percent = (audioPlayer.currentTime / audioPlayer.duration) * 100;
-            progress.style.width = percent + "%";
-            progressThumb.style.left = percent + "%";
-            timecode.textContent = `${formatTime(audioPlayer.currentTime)} / ${formatTime(audioPlayer.duration)}`;
+        noteInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                addNote();
+            }
         });
-
-        function skipTime(seconds) {
-            audioPlayer.currentTime += seconds;
-        }
-
-        function setPlaybackRate(rate) {
-            audioPlayer.playbackRate = rate;
-        }
-
-        function togglePlayPause() {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-            } else {
-                audioPlayer.pause();
-            }
-        }
-
-        function addNote() {
-            if (noteInput.value.trim() !== "") {
-                const time = formatTime(audioPlayer.currentTime);
-                const note = document.createElement("li");
-                note.textContent = `[${time}] ${noteInput.value}`;
-                document.getElementById("notesList").appendChild(note);
-                noteInput.value = "";
-            }
-        }
-
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = Math.floor(seconds % 60);
-            return `${minutes}:${remainingSeconds < 10 ? "0" : ""}${remainingSeconds}`;
-        }
 
         function startDrag(event) {
             isDragging = true;
             updateProgress(event);
-
             document.addEventListener("mousemove", updateProgress);
             document.addEventListener("mouseup", stopDrag);
-            document.addEventListener("touchmove", updateProgress);
+            document.addEventListener("touchmove", updateProgress, { passive: false });
             document.addEventListener("touchend", stopDrag);
         }
 
         function stopDrag() {
             isDragging = false;
-
             document.removeEventListener("mousemove", updateProgress);
             document.removeEventListener("mouseup", stopDrag);
             document.removeEventListener("touchmove", updateProgress);
@@ -253,15 +146,19 @@
 
         function updateProgress(event) {
             if (!isDragging) return;
-
+            event.preventDefault();
             const rect = progressBar.getBoundingClientRect();
             const clientX = event.touches ? event.touches[0].clientX : event.clientX;
             const offsetX = clientX - rect.left;
             const width = rect.width;
             const percent = Math.max(0, Math.min(1, offsetX / width));
-
+            progress.style.width = percent * 100 + "%";
+            progressThumb.style.left = percent * 100 + "%";
             audioPlayer.currentTime = percent * audioPlayer.duration;
         }
+
+        progressThumb.addEventListener("mousedown", startDrag);
+        progressThumb.addEventListener("touchstart", startDrag);
     </script>
 </body>
 </html>
