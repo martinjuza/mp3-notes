@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -27,14 +27,40 @@
     <button onclick="sendEmail('klara.juzova@krutart.cz')">Poslat Kláře</button>
 
     <script>
+        const BITLY_TOKEN = "d30a048c8d4759646e30b96a6952e2b04e0b297f";
+
         function generatePlayerLink() {
             let input = document.getElementById("dropboxUrl").value;
             if (input.includes("dropbox.com")) {
                 input = input.replace("dl=0", "raw=1");
                 const playerUrl = window.location.origin + "/mp3-notes/player.html?mp3=" + encodeURIComponent(input);
-                document.getElementById("generatedLink").value = playerUrl;
+                shortenLink(playerUrl);
             } else {
                 alert("Vložte platný Dropbox odkaz.");
+            }
+        }
+
+        async function shortenLink(longUrl) {
+            try {
+                const response = await fetch("https://api-ssl.bitly.com/v4/shorten", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${BITLY_TOKEN}`
+                    },
+                    body: JSON.stringify({ long_url: longUrl })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById("generatedLink").value = data.link;
+                } else {
+                    console.error("Chyba při zkracování odkazu:", await response.text());
+                    alert("Nepodařilo se zkrátit odkaz.");
+                }
+            } catch (error) {
+                console.error("Chyba při zkracování odkazu:", error);
+                alert("Nepodařilo se zkrátit odkaz.");
             }
         }
 
@@ -50,16 +76,12 @@
         }
 
         async function sendEmail(recipient) {
-            const serviceID = "service_1zb4g73"; // Nahraď svým Service ID
-            const templateID = "template_9epmozc"; // Nahraď svým Template ID
-            const userID = "PSTcucLXaEZGT6jCs"; // Tvůj veřejný klíč
-
-            const fullLink = document.getElementById("generatedLink").value;
-            const shortLink = "https://kr.link/" + btoa(fullLink).substring(0, 6); // Jednoduché zkrácení pomocí base64
-
+            const serviceID = "service_1zb4g73";
+            const templateID = "template_9epmozc";
+            const userID = "PSTcucLXaEZGT6jCs"; // Váš veřejný klíč
             const templateParams = {
-                recipient: recipient,
-                message: `Plný odkaz: ${fullLink}\nZkrácený odkaz: ${shortLink}`,
+                to_email: recipient,
+                message: document.getElementById("generatedLink").value,
             };
 
             try {
