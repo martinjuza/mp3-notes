@@ -1,74 +1,11 @@
+// player.html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title id="fileTitle"></title>
-    <style>
-        body { 
-            font-family: 'Arial', sans-serif; 
-            text-align: center; 
-            padding: 10px; 
-            margin: 0; 
-            background-color: #f9f9f9; 
-        }
-        audio { 
-            width: 100%; 
-            margin: 20px 0; 
-            border-radius: 10px;
-            background-color: #ffffff;
-        }
-        .btn-row { 
-            display: flex; 
-            justify-content: space-evenly; 
-            gap: 10px; 
-            margin: 10px 0; 
-            flex-wrap: wrap;
-        }
-        .btn-small, .btn-large, .note-btn { 
-            flex: 1; 
-            padding: 15px; 
-            font-size: 18px; 
-            background-color: #007bff; 
-            color: white; 
-            border: none; 
-            border-radius: 8px; 
-            cursor: pointer; 
-            user-select: none;
-            touch-action: manipulation;
-        }
-        .btn-small:active, .btn-large:active, .note-btn:active {
-            background-color: #0056b3;
-        }
-        textarea { 
-            width: 90%; 
-            height: 80px; 
-            margin: 10px 0; 
-            font-size: 16px; 
-            border: 1px solid #ccc; 
-            border-radius: 6px;
-        }
-        ul { 
-            text-align: left; 
-            max-width: 90%; 
-            margin: 20px auto; 
-            padding: 0; 
-            list-style: none;
-        }
-        li { 
-            padding: 10px; 
-            border-bottom: 1px solid #ccc; 
-            background-color: #ffffff;
-            border-radius: 4px; 
-            margin-bottom: 5px;
-        }
-        h1 { 
-            font-size: 1.5em; 
-            max-width: 90%; 
-            margin: auto; 
-            color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1 id="fileTitleDisplay"></h1>
@@ -89,97 +26,137 @@
     </div>
     
     <h3>Poznámky</h3>
-    <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
+    <textarea id="noteInput" placeholder="Zadejte poznámku... (Enter pro přidání)"></textarea>
     <br>
     <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
     <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
     <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
     <ul id="notesList"></ul>
-    
-    <script>
-        const audioPlayer = document.getElementById("audioPlayer");
-        const fileTitleDisplay = document.getElementById("fileTitleDisplay");
-        const noteInput = document.getElementById("noteInput");
 
-        const urlParams = new URLSearchParams(window.location.search);
-        const mp3Url = urlParams.get("mp3");
-        let fileName = "";
-        if (mp3Url) {
-            audioPlayer.src = mp3Url;
-            fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
-            fileTitleDisplay.textContent = fileName;
-        }
-
-        function skipTime(seconds) {
-            audioPlayer.currentTime += seconds;
-        }
-
-        function setPlaybackRate(rate) {
-            audioPlayer.playbackRate = rate;
-        }
-        
-        function togglePlayPause() {
-            if (audioPlayer.paused) {
-                audioPlayer.play();
-            } else {
-                audioPlayer.pause();
-            }
-        }
-
-        function addNote() {
-            if (noteInput.value.trim() !== "") {
-                const time = new Date(audioPlayer.currentTime * 1000).toISOString().substr(11, 8);
-                const note = document.createElement("li");
-                note.textContent = `[${time}] ${noteInput.value}`;
-                document.getElementById("notesList").appendChild(note);
-                noteInput.value = "";
-                navigator.vibrate(50);
-            }
-        }
-
-        function copyNotes() {
-            const notesList = document.getElementById("notesList");
-            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-            navigator.clipboard.writeText(fullText).then(() => {
-                alert("Poznámky zkopírovány do schránky!");
-            }).catch(() => {
-                alert("Nepodařilo se zkopírovat poznámky.");
-            });
-        }
-
-        async function sendNotesByEmail() {
-            const notesList = document.getElementById("notesList");
-            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-            
-            const templateParams = {
-                recipient: "martin.juza@krutart.cz",
-                message: fullText,
-            };
-
-            await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    service_id: "service_1zb4g73",
-                    template_id: "template_9ktlbtl",
-                    user_id: "PSTcucLXaEZGT6jCs",
-                    template_params: templateParams,
-                }),
-            });
-
-            alert("Poznámky odeslány e-mailem!");
-        }
-
-        // Oprava tlačítek na iPhonech
-        document.querySelectorAll("button").forEach(button => {
-            button.addEventListener("touchstart", event => {
-                event.preventDefault();
-                button.click();
-            }, { passive: false });
-        });
-
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
+
+// script.js
+const audioPlayer = document.getElementById("audioPlayer");
+const fileTitleDisplay = document.getElementById("fileTitleDisplay");
+const noteInput = document.getElementById("noteInput");
+
+const urlParams = new URLSearchParams(window.location.search);
+const mp3Url = urlParams.get("mp3");
+let fileName = "";
+if (mp3Url) {
+    audioPlayer.src = mp3Url;
+    fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
+    fileTitleDisplay.textContent = fileName;
+}
+
+function skipTime(seconds) {
+    audioPlayer.currentTime += seconds;
+}
+
+function setPlaybackRate(rate) {
+    audioPlayer.playbackRate = rate;
+}
+
+function togglePlayPause() {
+    if (audioPlayer.paused) {
+        audioPlayer.play();
+    } else {
+        audioPlayer.pause();
+    }
+}
+
+function addNote() {
+    if (noteInput.value.trim() !== "") {
+        const time = new Date(audioPlayer.currentTime * 1000).toISOString().substr(11, 8);
+        const note = document.createElement("li");
+        note.textContent = `[${time}] ${noteInput.value}`;
+        document.getElementById("notesList").appendChild(note);
+        noteInput.value = "";
+        if (navigator.vibrate) {
+            navigator.vibrate(50);
+        }
+    }
+}
+
+// Vylepšená funkce pro kopírování textu
+async function copyNotes() {
+    const notesList = document.getElementById("notesList");
+    const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+    const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+
+    try {
+        // Nejprve zkusíme moderní API
+        await navigator.clipboard.writeText(fullText);
+        alert("Poznámky zkopírovány do schránky!");
+    } catch (err) {
+        // Fallback pro Safari/iOS
+        const textArea = document.createElement("textarea");
+        textArea.value = fullText;
+        textArea.style.position = "fixed";
+        textArea.style.opacity = "0";
+        document.body.appendChild(textArea);
+        
+        // Pro iOS musíme upravit výběr
+        textArea.contentEditable = true;
+        textArea.readOnly = false;
+        
+        const range = document.createRange();
+        range.selectNodeContents(textArea);
+        
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        
+        textArea.setSelectionRange(0, fullText.length);
+        
+        try {
+            document.execCommand("copy");
+            alert("Poznámky zkopírovány do schránky!");
+        } catch (err) {
+            alert("Nepodařilo se zkopírovat poznámky. Zkuste to znovu.");
+        }
+        
+        document.body.removeChild(textArea);
+    }
+}
+
+// Enter pro přidání poznámky
+noteInput.addEventListener("keydown", function(event) {
+    if (event.key === "Enter" && !event.shiftKey) {
+        event.preventDefault(); // Zabrání vytvoření nového řádku
+        addNote();
+    }
+});
+
+// Email funkce
+async function sendNotesByEmail() {
+    const notesList = document.getElementById("notesList");
+    const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
+    const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
+    
+    await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+            service_id: "service_1zb4g73",
+            template_id: "template_9ktlbtl",
+            user_id: "PSTcucLXaEZGT6jCs",
+            template_params: {
+                recipient: "martin.juza@krutart.cz",
+                message: fullText,
+            },
+        }),
+    });
+
+    alert("Poznámky odeslány e-mailem!");
+}
+
+// Oprava tlačítek pro iOS
+document.querySelectorAll("button").forEach(button => {
+    button.addEventListener("touchstart", event => {
+        event.preventDefault();
+        button.click();
+    }, { passive: false });
+});
