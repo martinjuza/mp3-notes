@@ -1,57 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Přehrávač MP3 s poznámkami</title>
-    <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 10px; }
-        audio { width: 100%; margin: 20px 0; }
-        button { 
-            margin: 5px; 
-            padding: 15px; 
-            font-size: 16px; 
-            border-radius: 8px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-        }
-        button:active { background-color: #0056b3; }
-        textarea { width: 90%; height: 80px; margin: 10px 0; font-size: 16px; }
-        ul { text-align: left; max-width: 90%; margin: auto; }
-        li { padding: 8px; border-bottom: 1px solid #ccc; }
-    </style>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <h1 id="fileTitle">Přehráváte:</h1>
     <audio id="audioPlayer" controls></audio>
-    <div>
-        <button onclick="skipTime(-10)">⏪ -10s</button>
-        <button onclick="setPlaybackRate(1)">1x</button>
-        <button onclick="setPlaybackRate(1.25)">1.25x</button>
-        <button onclick="setPlaybackRate(1.5)">1.5x</button>
-        <button onclick="setPlaybackRate(1.75)">1.75x</button>
-        <button onclick="setPlaybackRate(2)">2x</button>
-        <button onclick="skipTime(10)">⏩ +10s</button>
+
+    <!-- Rychlosti přehrávání -->
+    <div class="btn-row">
+        <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
+        <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
     </div>
+
+    <!-- Přetáčení a play/pause -->
+    <div class="btn-row">
+        <button class="btn-large" onclick="skipTime(-10)">⏪ -10s</button>
+        <button class="btn-large" onclick="togglePlayPause()">▶️⏸ Play/Pause</button>
+        <button class="btn-large" onclick="skipTime(10)">⏩ +10s</button>
+    </div>
+
     <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
     <br>
-    <button onclick="addNote()">📌 Přidat poznámku</button>
-    <button onclick="copyNotes()">📋 Kopírovat poznámky</button>
-    <button onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+    <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
+    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
+    <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
     <ul id="notesList"></ul>
+
+    <!-- Inline skripty přímo v HTML -->
     <script>
         const audioPlayer = document.getElementById("audioPlayer");
         const fileTitle = document.getElementById("fileTitle");
         const noteInput = document.getElementById("noteInput");
-        
-        const EMAILJS_SERVICE_ID = "service_1zb4g73";
-        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
-        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs";
-        const RECIPIENT_EMAIL = "martin.juza@krutart.cz";
-        
+
         const urlParams = new URLSearchParams(window.location.search);
         const mp3Url = urlParams.get("mp3");
         let fileName = "";
@@ -69,6 +57,14 @@
             audioPlayer.playbackRate = rate;
         }
 
+        function togglePlayPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
         function addNote() {
             if (noteInput.value.trim() !== "") {
                 const time = new Date(audioPlayer.currentTime * 1000).toISOString().substr(11, 8);
@@ -76,58 +72,27 @@
                 note.textContent = `[${time}] ${noteInput.value}`;
                 document.getElementById("notesList").appendChild(note);
                 noteInput.value = "";
-                navigator.vibrate(50);
             }
         }
-        
-        noteInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                addNote();
-            }
-        });
 
         function copyNotes() {
             const notesList = document.getElementById("notesList");
             const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
             const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-            navigator.clipboard.writeText(fullText).then(() => {
-                alert("Poznámky zkopírovány do schránky!");
-            }).catch(err => {
-                console.error("Chyba při kopírování:", err);
-                alert("Nepodařilo se zkopírovat poznámky.");
-            });
+            const tempInput = document.createElement("textarea");
+            tempInput.value = fullText;
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand("copy");
+            document.body.removeChild(tempInput);
+            alert("Poznámky zkopírovány!");
         }
 
-        async function sendNotesByEmail() {
+        function sendNotesByEmail() {
             const notesList = document.getElementById("notesList");
             const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
             const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-            
-            const templateParams = {
-                recipient: RECIPIENT_EMAIL,
-                message: fullText,
-            };
-
-            try {
-                const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        service_id: EMAILJS_SERVICE_ID,
-                        template_id: EMAILJS_TEMPLATE_ID,
-                        user_id: EMAILJS_USER_ID,
-                        template_params: templateParams,
-                    }),
-                });
-                if (response.ok) {
-                    alert("Poznámky odeslány e-mailem!");
-                } else {
-                    alert("Nepodařilo se odeslat poznámky.");
-                }
-            } catch (error) {
-                alert("Nepodařilo se odeslat poznámky.");
-            }
+            alert("Zatím není implementováno odesílání e-mailů.");
         }
     </script>
 </body>
