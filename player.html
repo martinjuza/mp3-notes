@@ -3,23 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Přehrávač MP3 s poznámkami</title>
+    <title>Pitch Player</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <!-- Kontejner pro zarovnání všech prvků -->
     <div class="container">
-        <h1 id="fileTitle">Přehráváte:</h1>
-        <audio id="audioPlayer" controls></audio>
-
+        <h1 id="fileTitle"></h1>
+    
         <!-- Rychlosti přehrávání -->
-        <div class="btn-row">
+
+         <div class="btn-row">
             <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
             <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
             <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
             <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
             <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
         </div>
+        
+        <audio id="audioPlayer" controls></audio>       
 
         <!-- Přetáčení a play/pause -->
         <div class="btn-row">
