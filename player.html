@@ -2,27 +2,101 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title id="fileTitle"></title>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 10px; }
-        audio { width: 100%; margin: 20px 0; }
-        .btn-row { display: flex; justify-content: space-around; gap: 5px; margin: 10px 0; }
-        .btn-small { flex: 1; padding: 10px; font-size: 14px; }
-        .btn-large { flex: 1; padding: 15px; font-size: 18px; }
-        button { 
-            border-radius: 8px;
-            border: none;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
+        body { 
+            font-family: 'Arial', sans-serif; 
+            text-align: center; 
+            padding: 10px; 
+            margin: 0; 
+            background-color: #f9f9f9; 
         }
-        button:active { background-color: #0056b3; }
-        textarea { width: 90%; height: 80px; margin: 10px 0; font-size: 16px; }
-        ul { text-align: left; max-width: 90%; margin: auto; }
-        li { padding: 8px; border-bottom: 1px solid #ccc; }
-        h1 { font-size: 1.2em; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; max-width: 90%; margin: auto; }
-        .note-btn { display: block; width: 90%; margin: 10px auto; padding: 15px; font-size: 16px; }
+        audio { 
+            width: 100%; 
+            margin: 20px 0; 
+            border-radius: 10px;
+            background-color: #ffffff;
+        }
+        .btn-row { 
+            display: flex; 
+            justify-content: space-evenly; 
+            gap: 10px; 
+            margin: 10px 0; 
+            flex-wrap: wrap;
+        }
+        .btn-small { 
+            flex: 1; 
+            padding: 10px; 
+            font-size: 14px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+        }
+        .btn-small:active {
+            background-color: #0056b3;
+        }
+        .btn-large { 
+            flex: 1; 
+            padding: 15px; 
+            font-size: 18px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+        }
+        .btn-large:active {
+            background-color: #0056b3;
+        }
+        textarea { 
+            width: 90%; 
+            height: 80px; 
+            margin: 10px 0; 
+            font-size: 16px; 
+            border: 1px solid #ccc; 
+            border-radius: 6px;
+        }
+        ul { 
+            text-align: left; 
+            max-width: 90%; 
+            margin: 20px auto; 
+            padding: 0; 
+            list-style: none;
+        }
+        li { 
+            padding: 10px; 
+            border-bottom: 1px solid #ccc; 
+            background-color: #ffffff;
+            border-radius: 4px; 
+            margin-bottom: 5px;
+        }
+        h1 { 
+            font-size: 1.5em; 
+            word-wrap: break-word; 
+            white-space: normal; 
+            overflow-wrap: break-word; 
+            max-width: 90%; 
+            margin: auto; 
+            color: #333;
+        }
+        .note-btn { 
+            display: block; 
+            width: 90%; 
+            margin: 10px auto; 
+            padding: 15px; 
+            font-size: 16px; 
+            background-color: #007bff; 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+        }
+        .note-btn:active {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
@@ -145,6 +219,13 @@
                 alert("Nepodařilo se odeslat poznámky.");
             }
         }
+
+        // Disable double-tap zoom on buttons
+        document.addEventListener("touchstart", function(e) {
+            if (e.target.tagName === "BUTTON") {
+                e.preventDefault();
+            }
+        }, { passive: false });
     </script>
 </body>
 </html>
