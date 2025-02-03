@@ -7,9 +7,9 @@
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 10px; }
         audio { width: 100%; margin: 20px 0; }
-        .btn-row { display: flex; justify-content: center; gap: 5px; margin: 10px 0; }
-        .btn-small { padding: 10px; font-size: 14px; }
-        .btn-large { padding: 15px; font-size: 18px; }
+        .btn-row { display: flex; justify-content: space-around; gap: 5px; margin: 10px 0; }
+        .btn-small { flex: 1; padding: 10px; font-size: 14px; }
+        .btn-large { flex: 1; padding: 15px; font-size: 18px; }
         button { 
             border-radius: 8px;
             border: none;
@@ -21,6 +21,8 @@
         textarea { width: 90%; height: 80px; margin: 10px 0; font-size: 16px; }
         ul { text-align: left; max-width: 90%; margin: auto; }
         li { padding: 8px; border-bottom: 1px solid #ccc; }
+        h1 { font-size: 1.2em; word-wrap: break-word; white-space: normal; overflow-wrap: break-word; max-width: 90%; margin: auto; }
+        .note-btn { display: block; width: 90%; margin: 10px auto; padding: 15px; font-size: 16px; }
     </style>
 </head>
 <body>
@@ -44,9 +46,9 @@
     <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
     <br>
-    <button onclick="addNote()">📌 Přidat poznámku</button>
-    <button onclick="copyNotes()">📋 Kopírovat poznámky</button>
-    <button onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+    <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
+    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
+    <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
     <ul id="notesList"></ul>
     
     <script>
@@ -111,37 +113,6 @@
             }).catch(err => {
                 alert("Nepodařilo se zkopírovat poznámky.");
             });
-        }
-
-        async function sendNotesByEmail() {
-            const notesList = document.getElementById("notesList");
-            const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
-            const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
-            
-            const templateParams = {
-                recipient: RECIPIENT_EMAIL,
-                message: fullText,
-            };
-
-            try {
-                const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({
-                        service_id: EMAILJS_SERVICE_ID,
-                        template_id: EMAILJS_TEMPLATE_ID,
-                        user_id: EMAILJS_USER_ID,
-                        template_params: templateParams,
-                    }),
-                });
-                if (response.ok) {
-                    alert("Poznámky odeslány e-mailem!");
-                } else {
-                    alert("Nepodařilo se odeslat poznámky.");
-                }
-            } catch (error) {
-                alert("Nepodařilo se odeslat poznámky.");
-            }
         }
     </script>
 </body>
