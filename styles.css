@@ -1,4 +1,4 @@
-/* Základní styl pro stránku */
+/* Základní styl stránky */
 body {
     font-family: 'Poppins', sans-serif;
     margin: 0;
@@ -6,10 +6,9 @@ body {
     background-color: #ff0050;
     color: #ffffff;
     text-align: center;
-    overflow-x: hidden;
 }
 
-/* Hlavní nadpis */
+/* Nadpis */
 h1 {
     font-size: 24px;
     margin-bottom: 20px;
@@ -25,49 +24,43 @@ audio {
     background-color: #ffffff;
 }
 
-/* Kontejner pro sjednocení šířek */
-.container {
-    max-width: 90%; /* Šířka 90 % obrazovky */
-    margin: 0 auto;
-}
-
-/* Flexbox pro tlačítka */
+/* Flexbox pro zarovnání tlačítek */
 .btn-row {
     display: flex;
-    justify-content: space-between; /* Zarovná tlačítka rovnoměrně */
+    justify-content: space-between; /* Rovnoměrné zarovnání */
     margin: 15px 0;
+    width: 100%;
+    max-width: 700px; /* Zvýšený prostor */
+    margin-left: auto;
+    margin-right: auto;
 }
 
-/* Tlačítka */
-button {
-    font-size: 16px;
-    padding: 12px 20px;
-    border: none;
-    border-radius: 30px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    flex: 1; /* Stejná šířka pro všechna tlačítka */
-    margin: 0 5px;
-}
-
-button:active {
-    transform: scale(0.95);
-}
-
-/* Menší tlačítka */
+/* Rychlostní tlačítka */
 .btn-small {
     background-color: #005eff;
     color: #ffffff;
+    padding: 8px 12px; /* Menší velikost tlačítek */
+    border: none;
+    border-radius: 20px;
+    font-size: 14px;
+    flex: 1;
+    margin: 0 5px; /* Mezera mezi tlačítky */
 }
 
 .btn-small:hover {
     background-color: #0041c4;
 }
 
-/* Větší tlačítka */
+/* Hlavní tlačítka (přetáčení a play/pause) */
 .btn-large {
     background-color: #ffffff;
     color: #ff0050;
+    padding: 15px 25px; /* Větší tlačítka */
+    font-size: 18px;
+    border: none;
+    border-radius: 30px;
+    flex: 1;
+    margin: 0 10px;
 }
 
 .btn-large:hover {
@@ -76,9 +69,9 @@ button:active {
 
 /* Textové pole */
 textarea {
-    width: 100%; /* Přizpůsobí se šířce kontejneru */
-    max-width: 100%;
-    height: 100px;
+    width: calc(100% - 40px); /* Přizpůsobí se dostupnému prostoru */
+    max-width: 700px; /* Maximální šířka */
+    height: 120px; /* Větší výška pro pohodlné psaní */
     border: none;
     border-radius: 15px;
     padding: 15px;
@@ -86,15 +79,19 @@ textarea {
     color: #ff0050;
     background-color: #ffffff;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    margin: 15px 0;
+    margin: 15px auto;
 }
 
 /* Tlačítka pro poznámky */
 .note-btn {
     background-color: #ffffff;
     color: #ff0050;
+    padding: 12px 20px; /* Přiměřená velikost */
     font-size: 16px;
-    margin: 0 5px;
+    border: none;
+    border-radius: 30px;
+    flex: 1;
+    margin: 0 10px;
 }
 
 .note-btn:hover {
@@ -103,7 +100,7 @@ textarea {
 
 /* Seznam poznámek */
 ul {
-    max-width: 100%; /* Zarovnání na šířku tlačítek */
+    max-width: 700px; /* Zarovnání se šířkou tlačítek */
     margin: 20px auto;
     padding: 0;
     list-style: none;
