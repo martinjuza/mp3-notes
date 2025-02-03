@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Přehrávač MP3 s poznámkami</title>
+    <title id="fileTitle"></title>
     <style>
         body { font-family: Arial, sans-serif; text-align: center; padding: 10px; }
         audio { width: 100%; margin: 20px 0; }
+        .btn-row { display: flex; justify-content: center; gap: 5px; margin: 10px 0; }
+        .btn-small { padding: 10px; font-size: 14px; }
+        .btn-large { padding: 15px; font-size: 18px; }
         button { 
-            margin: 5px; 
-            padding: 15px; 
-            font-size: 16px; 
             border-radius: 8px;
             border: none;
             background-color: #007bff;
@@ -24,17 +24,23 @@
     </style>
 </head>
 <body>
-    <h1 id="fileTitle">Přehráváte:</h1>
+    <h1 id="fileTitleDisplay"></h1>
     <audio id="audioPlayer" controls></audio>
-    <div>
-        <button onclick="skipTime(-10)">⏪ -10s</button>
-        <button onclick="setPlaybackRate(1)">1x</button>
-        <button onclick="setPlaybackRate(1.25)">1.25x</button>
-        <button onclick="setPlaybackRate(1.5)">1.5x</button>
-        <button onclick="setPlaybackRate(1.75)">1.75x</button>
-        <button onclick="setPlaybackRate(2)">2x</button>
-        <button onclick="skipTime(10)">⏩ +10s</button>
+    
+    <div class="btn-row">
+        <button class="btn-small" onclick="setPlaybackRate(1)">1x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.25)">1.25x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.5)">1.5x</button>
+        <button class="btn-small" onclick="setPlaybackRate(1.75)">1.75x</button>
+        <button class="btn-small" onclick="setPlaybackRate(2)">2x</button>
     </div>
+    
+    <div class="btn-row">
+        <button class="btn-large" onclick="skipTime(-10)">⏪ -10s</button>
+        <button class="btn-large" onclick="togglePlayPause()">▶️⏸ Start/Stop</button>
+        <button class="btn-large" onclick="skipTime(10)">⏩ +10s</button>
+    </div>
+    
     <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
     <br>
@@ -42,13 +48,14 @@
     <button onclick="copyNotes()">📋 Kopírovat poznámky</button>
     <button onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
     <ul id="notesList"></ul>
+    
     <script>
         const audioPlayer = document.getElementById("audioPlayer");
-        const fileTitle = document.getElementById("fileTitle");
+        const fileTitleDisplay = document.getElementById("fileTitleDisplay");
         const noteInput = document.getElementById("noteInput");
         
         const EMAILJS_SERVICE_ID = "service_1zb4g73";
-        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
+        const EMAILJS_TEMPLATE_ID = "template_9ktlbtl";
         const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs";
         const RECIPIENT_EMAIL = "martin.juza@krutart.cz";
         
@@ -58,7 +65,7 @@
         if (mp3Url) {
             audioPlayer.src = mp3Url;
             fileName = decodeURIComponent(mp3Url.split("/").pop().split("?")[0]);
-            fileTitle.textContent = `Přehráváte: ${fileName}`;
+            fileTitleDisplay.textContent = fileName;
         }
 
         function skipTime(seconds) {
@@ -67,6 +74,14 @@
 
         function setPlaybackRate(rate) {
             audioPlayer.playbackRate = rate;
+        }
+        
+        function togglePlayPause() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
         }
 
         function addNote() {
@@ -94,7 +109,6 @@
             navigator.clipboard.writeText(fullText).then(() => {
                 alert("Poznámky zkopírovány do schránky!");
             }).catch(err => {
-                console.error("Chyba při kopírování:", err);
                 alert("Nepodařilo se zkopírovat poznámky.");
             });
         }
