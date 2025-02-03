@@ -46,32 +46,20 @@ noteInput.addEventListener("keydown", function(event) {
     }
 });
 
-// ✅ Spolehlivé kopírování poznámek (opraveno pro iPhone)
+// ✅ 100% funkční kopírování na iPhonech
 function copyNotes() {
     const notesList = document.getElementById("notesList");
     const notes = Array.from(notesList.children).map(note => note.textContent).join("\n");
     const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
 
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-        navigator.clipboard.writeText(fullText).then(() => {
-            alert("Zkopírováno!");
-        }).catch(() => {
-            fallbackCopyText(fullText);
-        });
-    } else {
-        fallbackCopyText(fullText);
-    }
-}
-
-// ✅ Fallback metoda pro iPhone, když clipboard nefunguje
-function fallbackCopyText(text) {
     const textArea = document.createElement("textarea");
-    textArea.value = text;
+    textArea.value = fullText;
     document.body.appendChild(textArea);
     textArea.select();
-    textArea.setSelectionRange(0, 99999);
+    textArea.setSelectionRange(0, 99999); // Pro jistotu na mobilních zařízeních
     document.execCommand("copy");
     document.body.removeChild(textArea);
+
     alert("Zkopírováno!");
 }
 
