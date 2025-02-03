@@ -26,23 +26,21 @@
         <button class="btn-large" onclick="skipTime(10)">⏩ +10s</button>
     </div>
 
-    <h3>Poznámky</h3>
     <textarea id="noteInput" placeholder="Zadejte poznámku..."></textarea>
     <br>
-    <button class="note-btn" onclick="addNote()">📌 Přidat poznámku</button>
-    <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
-    <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+
+    <!-- Kopírování a odesílání poznámek vedle sebe -->
+    <div class="btn-row">
+        <button class="note-btn" onclick="copyNotes()">📋 Kopírovat poznámky</button>
+        <button class="note-btn" onclick="sendNotesByEmail()">📧 Poslat poznámky e-mailem</button>
+    </div>
+
     <ul id="notesList"></ul>
 
     <script>
         const audioPlayer = document.getElementById("audioPlayer");
         const fileTitle = document.getElementById("fileTitle");
         const noteInput = document.getElementById("noteInput");
-
-        const EMAILJS_SERVICE_ID = "service_1zb4g73";
-        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
-        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs";
-        const RECIPIENT_EMAIL = "martin.juza@krutart.cz";
 
         const urlParams = new URLSearchParams(window.location.search);
         const mp3Url = urlParams.get("mp3");
@@ -106,7 +104,7 @@
             const fullText = `Soubor: ${fileName}\n\nPoznámky:\n${notes}`;
             
             const templateParams = {
-                recipient: RECIPIENT_EMAIL,
+                recipient: "martin.juza@krutart.cz",
                 message: fullText,
             };
 
@@ -115,9 +113,9 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({
-                        service_id: EMAILJS_SERVICE_ID,
-                        template_id: EMAILJS_TEMPLATE_ID,
-                        user_id: EMAILJS_USER_ID,
+                        service_id: "service_1zb4g73",
+                        template_id: "template_9epmozc",
+                        user_id: "PSTcucLXaEZGT6jCs",
                         template_params: templateParams,
                     }),
                 });
@@ -128,7 +126,6 @@
                 }
             } catch (error) {
                 alert("Nepodařilo se odeslat poznámky.");
-                console.error("Chyba:", error);
             }
         }
     </script>
