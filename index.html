@@ -112,7 +112,13 @@
     </div>
 
     <script>
-        async function generatePlayerLink() {
+        // EmailJS API parameters
+        const EMAILJS_SERVICE_ID = "service_1zb4g73";
+        const EMAILJS_TEMPLATE_ID = "template_9epmozc";
+        const EMAILJS_USER_ID = "PSTcucLXaEZGT6jCs"; // Tvůj veřejný klíč
+
+        // Generování odkazu pro přehrávač
+        function generatePlayerLink() {
             let input = document.getElementById("dropboxUrl").value;
             if (input.includes("dropbox.com")) {
                 input = input.replace("dl=0", "raw=1");
@@ -123,6 +129,7 @@
             }
         }
 
+        // Kopírování odkazu do schránky
         function copyGeneratedLink() {
             const generatedLink = document.getElementById("generatedLink");
             generatedLink.select();
@@ -134,14 +141,45 @@
             });
         }
 
+        // Odesílání e-mailu přes EmailJS
         async function sendEmail(recipient) {
             const messageLink = document.getElementById("generatedLink").value;
+
             if (!messageLink) {
                 alert("Nejprve vygenerujte odkaz.");
                 return;
             }
 
-            alert(`E-mail bude odeslán na: ${recipient}\nOdkaz: ${messageLink}`);
+            const templateParams = {
+                recipient: recipient,
+                message: messageLink,
+            };
+
+            try {
+                const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify({
+                        service_id: EMAILJS_SERVICE_ID,
+                        template_id: EMAILJS_TEMPLATE_ID,
+                        user_id: EMAILJS_USER_ID,
+                        template_params: templateParams,
+                    }),
+                });
+
+                if (response.ok) {
+                    alert("E-mail byl úspěšně odeslán!");
+                } else {
+                    const error = await response.text();
+                    console.error("Chyba při odesílání e-mailu:", error);
+                    alert("Nepodařilo se odeslat e-mail.");
+                }
+            } catch (error) {
+                console.error("Chyba při odesílání e-mailu:", error);
+                alert("Nepodařilo se odeslat e-mail.");
+            }
         }
     </script>
 </body>
